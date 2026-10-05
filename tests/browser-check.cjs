@@ -24,6 +24,11 @@ const path = require('node:path');
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), `Overflow: ${route}, ${width}px`);
       assert.equal(await page.locator('img').evaluateAll(imgs => imgs.every(img => img.complete && img.naturalWidth > 0)), true, `Images ${route}`);
       assert.equal(await page.locator('.main-nav>a').count(), 4);
+      for (const photo of await page.locator('.sofia-photo img').all()) {
+        const ratios = await photo.evaluate(img => ({ rendered: img.clientWidth / img.clientHeight, intrinsic: img.naturalWidth / img.naturalHeight }));
+        assert.ok(Math.abs(ratios.rendered - ratios.intrinsic) < 0.02, `Photo distorted: ${route}, ${width}px`);
+      }
+      if (width === 1440 && ['/services/', '/about/'].includes(route)) await page.screenshot({ path: path.join(folder, `desktop-${route.split('/')[1]}.png`), fullPage: true });
       if (width === 1440 && ['/', '/en/', '/contact/'].includes(route)) await page.screenshot({ path: path.join(folder, `desktop-${route === '/' ? 'bg' : route === '/en/' ? 'en' : 'contact'}.png`), fullPage: true });
       if (width === 390 && route === '/') await page.screenshot({ path: path.join(folder, 'mobile-bg.png'), fullPage: true });
     }

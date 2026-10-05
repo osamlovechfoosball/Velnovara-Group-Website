@@ -2,10 +2,9 @@ export const content = {
   bg: {
     nav: ['Начало', 'Услуги', 'За нас', 'Контакти'], skip: 'Към съдържанието', menu: 'Меню', close: 'Затвори менюто',
     location: 'София, България', eyebrow: 'АВТОМАТИЗАЦИЯ / AI / СОФТУЕР',
-    hero: ['По-малко рутинна работа.', 'Повече възможности.'],
+    hero: ['Автоматизация и софтуер.', 'Създадени за вашия бизнес.'],
     intro: 'Свързваме системи, разработваме AI решения и създаваме платформи и сайтове, които помагат на бизнеса да работи по-добре.',
     explore: 'Разгледайте услугите', talk: 'Да обсъдим вашия проект',
-    diagramLabel: 'От отделни инструменти до свързана система.', diagram: ['Вашият бизнес', 'Данни и инструменти', 'Свързване', 'Автоматизация', 'Резултат'],
     servicesLabel: 'КАКВО ПРАВИМ', servicesTitle: 'Технология с ясна цел.', servicesIntro: 'Започваме от реалния процес във вашия бизнес. След това избираме правилната технология.',
     services: [
       ['Системна автоматизация', 'Свързваме ежедневните ви процеси, за да намалим ръчната работа и повторението.', ['Автоматизирани работни процеси', 'CRM и вътрешни системи', 'Обработка на данни и документи']],
@@ -35,9 +34,8 @@ export const content = {
   },
   en: {
     nav: ['Home', 'Services', 'About us', 'Contact'], skip: 'Skip to content', menu: 'Menu', close: 'Close menu',
-    location: 'Sofia, Bulgaria', eyebrow: 'AUTOMATION / AI / SOFTWARE', hero: ['Less repetitive work.', 'More possibility.'],
+    location: 'Sofia, Bulgaria', eyebrow: 'AUTOMATION / AI / SOFTWARE', hero: ['Automation and software.', 'Built around your business.'],
     intro: 'We connect systems, engineer AI solutions, and build platforms and websites that help businesses work better.', explore: 'Explore our services', talk: 'Let’s discuss your project',
-    diagramLabel: 'From separate tools to a connected system.', diagram: ['Your business', 'Data & tools', 'Integration', 'Automation', 'Outcome'],
     servicesLabel: 'WHAT WE DO', servicesTitle: 'Technology with a clear purpose.', servicesIntro: 'We start with the actual process in your business. Then we choose the right technology.',
     services: [
       ['System automation', 'Connect everyday processes to reduce manual work and repetition.', ['Automated workflows', 'CRM and internal systems', 'Data and document processing']],
