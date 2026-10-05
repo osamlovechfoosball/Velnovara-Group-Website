@@ -1,0 +1,62 @@
+export const content = {
+  bg: {
+    nav: ['Начало', 'Услуги', 'За нас', 'Контакти'], skip: 'Към съдържанието', menu: 'Меню', close: 'Затвори менюто',
+    location: 'София, България', eyebrow: 'АВТОМАТИЗАЦИЯ / AI / СОФТУЕР',
+    hero: ['По-малко рутинна работа.', 'Повече възможности.'],
+    intro: 'Свързваме системи, разработваме AI решения и създаваме платформи и сайтове, които помагат на бизнеса да работи по-добре.',
+    explore: 'Разгледайте услугите', talk: 'Да обсъдим вашия проект',
+    diagramLabel: 'От отделни инструменти до свързана система.', diagram: ['Вашият бизнес', 'Данни и инструменти', 'Свързване', 'Автоматизация', 'Резултат'],
+    servicesLabel: 'КАКВО ПРАВИМ', servicesTitle: 'Технология с ясна цел.', servicesIntro: 'Започваме от реалния процес във вашия бизнес. След това избираме правилната технология.',
+    services: [
+      ['Системна автоматизация', 'Свързваме ежедневните ви процеси, за да намалим ръчната работа и повторението.', ['Автоматизирани работни процеси', 'CRM и вътрешни системи', 'Обработка на данни и документи']],
+      ['AI инженерство', 'Разработваме практични AI решения с конкретна задача, ясни ограничения и човешки контрол.', ['AI асистенти и агенти', 'Търсене в документи и знания', 'Интеграция на езикови модели']],
+      ['SaaS и платформи', 'Създаваме уеб приложения и платформи, съобразени с потребителите и начина ви на работа.', ['SaaS продукти', 'Клиентски и партньорски портали', 'Вътрешни бизнес приложения']],
+      ['API интеграции', 'Помагаме на софтуера ви да обменя информация надеждно, без излишно дублиране.', ['Свързване на външни услуги', 'Разработка на API', 'Синхронизация на системи']],
+      ['Уебсайтове', 'Изграждаме бързи, ясни и удобни сайтове, които представят бизнеса ви професионално.', ['Фирмени сайтове', 'Адаптивен дизайн', 'Многоезично съдържание']]
+    ],
+    more: 'Повече за услугата', allServices: 'Всички услуги',
+    processLabel: 'НАЧИН НА РАБОТА', processTitle: 'Първо разбираме. После изграждаме.',
+    process: [['Разговор', 'Изясняваме задачата, настоящите инструменти и желания резултат.'], ['План', 'Определяме обхват, приоритети и начин да проверим дали решението работи.'], ['Разработка', 'Изграждаме на етапи и обсъждаме работещите части с вас.'], ['Предаване', 'Тестваме, документираме и ви помагаме да използвате решението.']],
+    aboutLabel: 'VELNOVARA GROUP', aboutHomeTitle: 'От София. С поглед към вашия бизнес.',
+    aboutIntro: 'Velnovara Group е компания със седалище в София, фокусирана върху автоматизация, AI инженерство и разработка на софтуер за бизнеси и клиенти.',
+    aboutMore: 'Запознайте се с нас', photoAlt: 'Панорама на София с катедралата „Св. Александър Невски“', photoCaption: 'София, България',
+    ctaTitle: 'Какво искате да работи по-добре?', ctaText: 'Разкажете ни за процеса, идеята или проекта си. Ще започнем с разговор.',
+    servicesPageTitle: 'Решения, съобразени с бизнеса ви.', servicesPageIntro: 'От автоматизация на конкретен процес до цялостна платформа — свързваме отделните части в работещо решение.', discuss: 'Обсъдете тази услуга',
+    aboutTitle: 'Ясно мислене. Практични решения.',
+    aboutBody: 'Работим с компании и клиенти, които искат да опростят процесите си, да свържат инструментите си или да превърнат идея в работещ дигитален продукт. За нас технологията има смисъл, когато решава конкретен проблем.',
+    principlesLabel: 'КАКВО Е ВАЖНО ЗА НАС', principles: [['Яснота', 'Разбираем обхват, открита комуникация и решения, които можете да обясните.'], ['Практичност', 'Избираме технология според задачата, а не според тенденцията.'], ['Надеждност', 'Мислим за поддръжката, сигурността и следващата стъпка още от началото.']],
+    contactTitle: 'Нека започнем с разговор.', contactIntro: 'Разкажете ни какво искате да автоматизирате, свържете или изградите. Не е нужно да имате готово техническо задание.',
+    emailLabel: 'ПИШЕТЕ НИ', locationLabel: 'НАШАТА БАЗА', formTitle: 'Вашият проект', name: 'Име', email: 'Имейл', message: 'Съобщение', namePlaceholder: 'Вашето име', emailPlaceholder: 'you@company.com', messagePlaceholder: 'Какво бихте искали да работи по-добре?', send: 'Изпрати запитване', sending: 'Изпращане…',
+    privacyNote: 'Използваме данните ви само за да отговорим на запитването. Съобщението се изпраща по имейл чрез Resend.',
+    success: 'Запитването е изпратено успешно. Благодарим ви!', error: 'Съобщението не беше изпратено. Опитайте отново или ни пишете директно по имейл.', unavailable: 'Формулярът временно не е достъпен. Моля, пишете ни на velnovaragroup@gmail.com.', invalid: 'Проверете името, имейла и съобщението си.', rate: 'Твърде много опити. Моля, изчакайте няколко минути.',
+    footerText: 'Автоматизация, AI и софтуер с практическа стойност.', rights: 'Всички права запазени.', credits: 'Снимка: Deensel / CC BY 2.0 · изрязана и оптимизирана',
+    titles: ['Автоматизация, AI и софтуер', 'Услуги', 'За нас', 'Контакти'],
+    descriptions: ['Velnovara Group — системна автоматизация, AI инженерство, SaaS платформи, API интеграции и уебсайтове. София, България.', 'Практични услуги за автоматизация, AI, SaaS, API интеграции и разработка на уебсайтове.', 'Запознайте се с Velnovara Group, софтуерна компания със седалище в София.', 'Свържете се с Velnovara Group и разкажете за вашия проект.']
+  },
+  en: {
+    nav: ['Home', 'Services', 'About us', 'Contact'], skip: 'Skip to content', menu: 'Menu', close: 'Close menu',
+    location: 'Sofia, Bulgaria', eyebrow: 'AUTOMATION / AI / SOFTWARE', hero: ['Less repetitive work.', 'More possibility.'],
+    intro: 'We connect systems, engineer AI solutions, and build platforms and websites that help businesses work better.', explore: 'Explore our services', talk: 'Let’s discuss your project',
+    diagramLabel: 'From separate tools to a connected system.', diagram: ['Your business', 'Data & tools', 'Integration', 'Automation', 'Outcome'],
+    servicesLabel: 'WHAT WE DO', servicesTitle: 'Technology with a clear purpose.', servicesIntro: 'We start with the actual process in your business. Then we choose the right technology.',
+    services: [
+      ['System automation', 'Connect everyday processes to reduce manual work and repetition.', ['Automated workflows', 'CRM and internal systems', 'Data and document processing']],
+      ['AI engineering', 'Practical AI solutions with a defined task, clear limits, and human oversight.', ['AI assistants and agents', 'Document and knowledge search', 'Language model integration']],
+      ['SaaS & platforms', 'Web applications and platforms shaped around your users and the way you work.', ['SaaS products', 'Customer and partner portals', 'Internal business applications']],
+      ['API integrations', 'Help your software exchange information reliably, without unnecessary duplication.', ['Third-party integrations', 'API development', 'System synchronisation']],
+      ['Websites', 'Fast, clear, accessible websites that present your business professionally.', ['Company websites', 'Responsive design', 'Multilingual content']]
+    ],
+    more: 'Explore this service', allServices: 'All services', processLabel: 'HOW WE WORK', processTitle: 'Understand first. Build next.',
+    process: [['Conversation', 'Understand the task, your current tools, and the outcome you need.'], ['Plan', 'Define the scope, priorities, and how we will verify the solution.'], ['Development', 'Build in stages and review the working parts with you.'], ['Handover', 'Test, document, and help you put the solution to work.']],
+    aboutLabel: 'VELNOVARA GROUP', aboutHomeTitle: 'Based in Sofia. Focused on your business.',
+    aboutIntro: 'Velnovara Group is a Sofia-based company focused on automation, AI engineering, and software development for businesses and clients.', aboutMore: 'Get to know us', photoAlt: 'Sofia panorama featuring Saint Alexander Nevsky Cathedral', photoCaption: 'Sofia, Bulgaria',
+    ctaTitle: 'What would you like to work better?', ctaText: 'Tell us about your process, idea, or project. We’ll start with a conversation.',
+    servicesPageTitle: 'Solutions shaped around your business.', servicesPageIntro: 'From automating a single process to building an entire platform, we bring the separate pieces together into a working solution.', discuss: 'Discuss this service',
+    aboutTitle: 'Clear thinking. Practical solutions.', aboutBody: 'We work with businesses and clients who want to simplify processes, connect tools, or turn an idea into a working digital product. For us, technology matters when it solves a specific problem.',
+    principlesLabel: 'WHAT MATTERS TO US', principles: [['Clarity', 'An understandable scope, open communication, and solutions you can explain.'], ['Practicality', 'Choose the technology that fits the task, rather than the trend.'], ['Reliability', 'Consider maintenance, security, and the next step from the start.']],
+    contactTitle: 'Let’s start with a conversation.', contactIntro: 'Tell us what you want to automate, connect, or build. You don’t need a finished technical brief.', emailLabel: 'WRITE TO US', locationLabel: 'OUR BASE', formTitle: 'Your project', name: 'Name', email: 'Email', message: 'Message', namePlaceholder: 'Your name', emailPlaceholder: 'you@company.com', messagePlaceholder: 'What would you like to work better?', send: 'Send enquiry', sending: 'Sending…',
+    privacyNote: 'We use your details only to respond to your enquiry. Your message is sent by email through Resend.', success: 'Your enquiry was sent successfully. Thank you!', error: 'Your message was not sent. Please try again or email us directly.', unavailable: 'The form is temporarily unavailable. Please email velnovaragroup@gmail.com.', invalid: 'Please check your name, email, and message.', rate: 'Too many attempts. Please wait a few minutes.',
+    footerText: 'Automation, AI, and software with practical value.', rights: 'All rights reserved.', credits: 'Photo: Deensel / CC BY 2.0 · cropped and optimised',
+    titles: ['Automation, AI & software', 'Services', 'About us', 'Contact'], descriptions: ['Velnovara Group — system automation, AI engineering, SaaS platforms, API integrations, and websites. Sofia, Bulgaria.', 'Practical automation, AI, SaaS, API integration, and website development services.', 'Meet Velnovara Group, a software company based in Sofia, Bulgaria.', 'Contact Velnovara Group and tell us about your project.']
+  }
+};

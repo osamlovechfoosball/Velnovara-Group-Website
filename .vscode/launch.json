@@ -1,0 +1,9 @@
+{
+  "version": "0.2.0",
+  "configurations": [{
+    "type": "node", "request": "launch", "name": "Velnovara website",
+    "program": "${workspaceFolder}/server.mjs", "runtimeArgs": ["--env-file-if-exists=.env"],
+    "preLaunchTask": "Website: build", "console": "integratedTerminal",
+    "serverReadyAction": { "pattern": "Velnovara Group: (http://localhost:[0-9]+)", "uriFormat": "%s", "action": "openExternally" }
+  }]
+}

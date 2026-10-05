@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+coverage/
+test-results/
+*.log
+.DS_Store
+.sites-runtime/
+public/assets/sofia-original.jpg
