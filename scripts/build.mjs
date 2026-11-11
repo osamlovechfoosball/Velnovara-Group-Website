@@ -109,8 +109,14 @@ export function render(lang, page = '') {
   const main = legalIndex < 0
     ? hero(t) + services(t) + about(t) + contactSection(t, lang)
     : legalPage(lang, page, t.legal[legalIndex]);
-  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${title}</title><meta name="description" content="${escape(description)}"><link rel="canonical" href="${url}"><link rel="alternate" hreflang="bg" href="${site + pathFor('bg', page)}"><link rel="alternate" hreflang="en" href="${site + pathFor('en', page)}"><link rel="alternate" hreflang="x-default" href="${site + pathFor('bg', page)}"><meta name="theme-color" content="#ffffff"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="preload" href="/assets/fonts/${font}-wght-normal.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="/styles.css?v=${version}"><meta property="og:type" content="website"><meta property="og:site_name" content="Velnovara Group"><meta property="og:locale" content="${lang === 'bg' ? 'bg_BG' : 'en_GB'}"><meta property="og:title" content="${escape(title)}"><meta property="og:description" content="${escape(description)}"><meta property="og:url" content="${url}"><meta property="og:image" content="${site}/assets/og-image.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">${legalIndex < 0 ? `<script type="application/ld+json">${structuredData(lang)}</script>` : ''}<script type="application/json" id="ui-strings">${strings}</script><script src="/app.js?v=${version}" defer></script></head><body class="page-${page || 'home'}"><a class="skip-link" href="#main">${t.skip}</a>${header(lang, page)}<main id="main">${main}</main>${footer(lang)}</body></html>`;
+  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">${csp}<title>${title}</title><meta name="description" content="${escape(description)}"><link rel="canonical" href="${url}"><link rel="alternate" hreflang="bg" href="${site + pathFor('bg', page)}"><link rel="alternate" hreflang="en" href="${site + pathFor('en', page)}"><link rel="alternate" hreflang="x-default" href="${site + pathFor('bg', page)}"><meta name="theme-color" content="#ffffff"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="preload" href="/assets/fonts/${font}-wght-normal.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="/styles.css?v=${version}"><meta property="og:type" content="website"><meta property="og:site_name" content="Velnovara Group"><meta property="og:locale" content="${lang === 'bg' ? 'bg_BG' : 'en_GB'}"><meta property="og:title" content="${escape(title)}"><meta property="og:description" content="${escape(description)}"><meta property="og:url" content="${url}"><meta property="og:image" content="${site}/assets/og-image.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">${legalIndex < 0 ? `<script type="application/ld+json">${structuredData(lang)}</script>` : ''}<script type="application/json" id="ui-strings">${strings}</script><script src="/app.js?v=${version}" defer></script></head><body class="page-${page || 'home'}"><a class="skip-link" href="#main">${t.skip}</a>${header(lang, page)}<main id="main">${main}</main>${footer(lang)}</body></html>`;
 }
+
+// GitHub Pages cannot send headers, so the page carries its own Content-Security-Policy.
+const csp = `<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">`;
+
+// GitHub Pages cannot redirect, so the former pages become tiny pages that forward to their section.
+const movedPage = (to, lang) => `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url=${to}"><link rel="canonical" href="${site + to}"><title>Velnovara Group</title></head><body><a href="${to}">Velnovara Group</a></body></html>`;
 
 const notFound = () => `<!doctype html><html lang="bg"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>404 | Velnovara Group</title><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/styles.css?v=${version}"></head><body class="page-error"><main class="wrap error-page">${brand('bg')}<div class="error-content"><p class="error-number" aria-hidden="true">404</p><h1>Тази страница не е намерена.</h1><p>Проверете адреса или се върнете към началната страница.</p><p lang="en">We couldn’t find this page. Check the address or return to the homepage.</p><div class="actions"><a class="button" href="/">Към началото<span aria-hidden="true">→</span></a><a class="button button-secondary" href="/en/" lang="en">Home in English</a></div></div></main></body></html>`;
 
@@ -128,7 +134,17 @@ for (const lang of ['bg', 'en']) {
     await writeFile(`${folder}index.html`, render(lang, page));
   }
 }
+for (const lang of ['bg', 'en']) {
+  for (const section of ['services', 'about', 'contact']) {
+    await mkdir(`${root}dist${base(lang)}${section}`, { recursive: true });
+    await writeFile(`${root}dist${base(lang)}${section}/index.html`, movedPage(`${base(lang)}#${section}`, lang));
+  }
+}
 await writeFile(`${root}dist/404.html`, notFound());
+// GitHub Pages: serve the custom domain and publish files as they are.
+await writeFile(`${root}dist/CNAME`, `${new URL(site).host}
+`);
+await writeFile(`${root}dist/.nojekyll`, '');
 await writeFile(`${root}dist/sitemap.xml`, sitemap());
 await writeFile(`${root}dist/robots.txt`, `User-agent: *\nAllow: /\n\nSitemap: ${site}/sitemap.xml\n`);
 console.log('Built the one-page site (Bulgarian + English) and legal pages.');
