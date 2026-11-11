@@ -29,36 +29,30 @@ The registered details of Велновара Груп ЕООД (ЕИК 208991366
 
 Set `SITE_URL` in `.env` (or the host's environment) to the live address, e.g. `https://velnovaragroup.eu`. It is used for canonical links, language alternates, sharing previews and `sitemap.xml`.
 
-## Activate the contact form
+## Live site: GitHub Pages (free)
 
-The server sends enquiries to **velnovaragroup@gmail.com**. The public address shown on the site is **support@velnovaragroup.eu**, which Porkbun email forwarding delivers to the same Gmail inbox (set under the domain's Email Forwarding in Porkbun). It sets Reply-To to the visitor’s email so you can reply normally. The browser never sees email credentials.
+The site is published at **https://velnovaragroup.eu** by GitHub Pages. Every push to `main` runs `.github/workflows/pages.yml`, which checks and builds the site and deploys `dist/`. GitHub Pages is free for public repositories.
 
-1. Copy `.env.example` to `.env`.
-2. Create a [Resend API key](https://resend.com/docs/dashboard/api-keys/introduction) with permission to send email.
-3. [Verify your sending domain](https://resend.com/docs/dashboard/domains/introduction) in Resend.
-4. Set `RESEND_API_KEY` and `CONTACT_FROM` in `.env`. For example, `CONTACT_FROM="Velnovara Group <website@velnovaragroup.eu>"`.
-5. Keep `CONTACT_TO=velnovaragroup@gmail.com`. Do not put Gmail as the sender unless an email provider explicitly authorises it; it is the destination here.
-6. Restart `npm start`. Submit a real enquiry and confirm receipt in Gmail, including spam folders.
+One-time setup:
 
-**Live delivery works.** On 11 November 2026 a real test enquiry was sent through the form handler from `website@velnovaragroup.eu` (domain verified in Resend, with a key limited to sending from that domain) to velnovaragroup@gmail.com, and Resend accepted it. Use the same `RESEND_API_KEY` and `CONTACT_FROM` on the hosting provider. Without credentials, the form gives an honest error and a direct email alternative. It never pretends to send. Automated tests use a mocked provider and do not send real messages.
+1. Publish the repository on GitHub as **public** (GitHub Desktop: *Publish repository*, untick *Keep this code private*).
+2. On GitHub: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+3. In **Settings → Pages → Custom domain**, enter `velnovaragroup.eu` and save; once the certificate is ready, tick **Enforce HTTPS**.
+4. At Porkbun (DNS for velnovaragroup.eu): replace the parking `ALIAS` on the root domain with four `A` records pointing to `185.199.108.153`, `185.199.109.153`, `185.199.110.153` and `185.199.111.153`, and add `CNAME www → <github-username>.github.io`. Keep the MX, SPF, Resend (`resend._domainkey`, `rsend`, `send`) and `_dmarc` records unchanged.
 
-API reference: [Resend send email](https://resend.com/docs/api-reference/emails/send-email).
+GitHub Pages cannot send headers or redirects, so the build adds a Content-Security-Policy meta tag, a `CNAME` file and small forwarding pages for the former `/services/`, `/about/` and `/contact/` routes.
 
-## Deploy
+## Contact form and email
 
-This is a static website with a small Node.js email server. **GitHub Pages alone cannot run the contact endpoint.** Deploy the whole project to a Node.js host or container host with HTTPS.
+- **On GitHub Pages** the form sends through [Web3Forms](https://web3forms.com) (free, 250 messages a month) to **velnovaragroup@gmail.com**. Get an access key at web3forms.com for that address and put it in `formKey` in the `company` object of `scripts/content.mjs`. The key is meant to be public: it only lets the form deliver to the inbox registered with it. Replies go to the visitor's own address.
+- **With the Node server** (`npm start` or Docker, when `formKey` is empty) the form posts to `/api/contact`, which sends through Resend from `website@velnovaragroup.eu` (domain verified in Resend). Set `RESEND_API_KEY`, `CONTACT_FROM` and `CONTACT_TO` in `.env`; see `.env.example`. A real test on 11 November 2026 was delivered to velnovaragroup@gmail.com. The server validates input, enforces same-origin requests, uses a honeypot and limits submissions per IP; it never stores enquiries.
+- The public address shown on the site is **support@velnovaragroup.eu**. Porkbun email forwarding delivers it to velnovaragroup@gmail.com, and Gmail's *Send mail as* (SMTP `smtp.resend.com`) sends replies from it.
 
-- Build command: `npm ci && npm run build`
-- Start command: `npm start`
-- Node: 24 LTS (22+ supported)
-- Set `HOST=0.0.0.0` on hosting and the provider’s `PORT`.
-- Set `PUBLIC_ORIGIN=https://your-actual-domain.com` exactly (no trailing slash).
-- Set `CONTACT_TO`, `CONTACT_FROM`, and `RESEND_API_KEY` in the hosting provider’s secret settings.
-- Set `TRUST_PROXY=1` only if your trusted host overwrites X-Forwarded-For. Keep `0` otherwise.
+Without a working setup the form shows an honest error with the support address; it never pretends to send.
 
-The server validates input, enforces same-origin requests and a payload size limit, uses a honeypot, limits submissions per IP, and sends idempotency keys to the provider. The rate limit is in memory per server process; for multi-instance production traffic add a shared limiter or edge abuse protection. The server does not save enquiries locally or log message contents.
+## Other hosting (optional)
 
-A Dockerfile is provided. Build with the live address: `docker build --build-arg SITE_URL=https://your-actual-domain.com -t velnovara-website .`; run with an environment file and published port. Place production traffic behind an HTTPS reverse proxy. Static routes, assets, and the contact endpoint must share the same origin.
+The project still runs as a small Node.js server (`npm start`, Node 24) or Docker image: `docker build --build-arg SITE_URL=https://velnovaragroup.eu -t velnovara-website .`. Then set `HOST=0.0.0.0`, the host's `PORT`, `PUBLIC_ORIGIN=https://velnovaragroup.eu` and the Resend settings, and put it behind HTTPS.
 
 ## Edit the website
 
@@ -86,14 +80,7 @@ This checks JavaScript syntax, builds both languages, and runs meaningful email 
 
 ## Publish the repository to GitHub
 
-The folder contains an initial Git commit on `main`, with secrets and generated build output excluded. In VS Code’s Source Control view, select **Publish Branch**, sign into GitHub, and choose the repository visibility. Alternatively:
-
-```powershell
-git remote add origin https://github.com/YOUR-ACCOUNT/velnovara-group-website.git
-git push -u origin main
-```
-
-Create an empty GitHub repository first (without a README). No remote repository is created by this delivery.
+Open the folder in GitHub Desktop and choose **Publish repository**, named `velnovara-group-website`, with *Keep this code private* unticked (GitHub Pages is free only for public repositories). `.env`, `dist/` and the old preview folders are excluded by `.gitignore`, so no secrets are uploaded. Then follow *Live site: GitHub Pages* above.
 
 ## Image and brand credits
 
@@ -107,9 +94,8 @@ The Velnovara logo was supplied and approved by the owner. The SVG is a faithful
 
 - One-page responsive site with privacy and GDPR pages, in Bulgarian and English.
 - Default route is Bulgarian, with correct language attributes and localised metadata.
-- Enquiries configured to the provided Gmail destination.
-- Backend integration and error states tested without sending real email.
-- Owner’s email credentials and a live receipt test remain necessary before enabling production enquiries.
-- Local repository is ready for GitHub; publishing requires the owner’s GitHub sign-in.
+- Published by GitHub Pages on velnovaragroup.eu after the one-time setup above.
+- Contact form: Web3Forms on GitHub Pages (needs the access key in `formKey`); Resend through the Node server, tested with real delivery.
+- support@velnovaragroup.eu forwards to velnovaragroup@gmail.com; replies are sent from it through Resend SMTP.
 
 No analytics, tracking cookies, or invented client testimonials are included.

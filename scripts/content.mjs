@@ -11,7 +11,11 @@ export const company = {
   },
   postal: { street: { bg: 'ул. „Градина“ № 53', en: '53 Gradina St.' }, code: '1616', city: { bg: 'София', en: 'Sofia' }, country: { bg: 'България', en: 'Bulgaria' } },
   contactEmail: 'support@velnovaragroup.eu', // public address; Porkbun forwards it to velnovaragroup@gmail.com
-  contactPhone: '+359 896 726 277'
+  contactPhone: '+359 896 726 277',
+  // Web3Forms access key for the contact form on GitHub Pages. It is meant to be public
+  // (it only lets the form deliver to the inbox registered at web3forms.com).
+  // Empty = the form posts to the Node server instead (npm start / Docker).
+  formKey: ''
 };
 
 export const content = {

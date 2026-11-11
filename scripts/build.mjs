@@ -104,7 +104,7 @@ export function render(lang, page = '') {
   const title = legalIndex < 0 ? t.meta.title : `${t.legal[legalIndex]} | Velnovara Group`;
   const description = legalIndex < 0 ? t.meta.description : `${t.legal[legalIndex]} — Velnovara Group.`;
   const url = site + pathFor(lang, page);
-  const strings = JSON.stringify({ ...t.form, menu: t.menu, close: t.close }).replace(/</g, '\\u003c');
+  const strings = JSON.stringify({ ...t.form, menu: t.menu, close: t.close, formKey: company.formKey, subject: 'Velnovara Group — website enquiry / запитване' }).replace(/</g, '\\u003c');
   const font = lang === 'bg' ? 'manrope-cyrillic' : 'manrope-latin';
   const main = legalIndex < 0
     ? hero(t) + services(t) + about(t) + contactSection(t, lang)
@@ -113,7 +113,7 @@ export function render(lang, page = '') {
 }
 
 // GitHub Pages cannot send headers, so the page carries its own Content-Security-Policy.
-const csp = `<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">`;
+const csp = `<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'${company.formKey ? ' https://api.web3forms.com' : ''}; object-src 'none'; base-uri 'none'; form-action 'self'">`;
 
 // GitHub Pages cannot redirect, so the former pages become tiny pages that forward to their section.
 const movedPage = (to, lang) => `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url=${to}"><link rel="canonical" href="${site + to}"><title>Velnovara Group</title></head><body><a href="${to}">Velnovara Group</a></body></html>`;

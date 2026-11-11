@@ -145,14 +145,30 @@ if (form) {
     status.removeAttribute('data-state');
     try {
       const data = Object.fromEntries(new FormData(form));
-      const response = await fetch('/api/contact', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, language: document.documentElement.lang, startedAt, submissionId }),
-        signal: AbortSignal.timeout(20000)
-      });
-      const result = await response.json();
-      if (!response.ok || !result.ok) {
-        const key = response.status === 503 ? 'unavailable' : response.status === 429 ? 'rate' : response.status === 400 ? 'invalid' : 'error';
+      const language = document.documentElement.lang;
+      // A filled honeypot means a bot: show success and send nothing.
+      if (data.website) { form.reset(); status.textContent = strings.success; status.dataset.state = 'success'; return; }
+      let response, sent;
+      if (strings.formKey) {
+        // Static hosting (GitHub Pages): Web3Forms delivers the message to the company inbox.
+        response = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ access_key: strings.formKey, subject: strings.subject, from_name: 'Velnovara Group website', name: data.name, email: data.email, message: data.message, language, botcheck: '' }),
+          signal: AbortSignal.timeout(20000)
+        });
+        sent = (await response.json()).success === true;
+      } else {
+        // Node server (npm start / Docker): server.mjs sends through Resend.
+        response = await fetch('/api/contact', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...data, language, startedAt, submissionId }),
+          signal: AbortSignal.timeout(20000)
+        });
+        sent = (await response.json()).ok === true;
+      }
+      if (!response.ok || !sent) {
+        // The browser has already checked the fields, so a Web3Forms 400 means a setup problem, not visitor input.
+        const key = response.status === 503 ? 'unavailable' : response.status === 429 ? 'rate' : response.status === 400 && !strings.formKey ? 'invalid' : 'error';
         throw new Error(key);
       }
       form.reset(); startedAt = Date.now(); submissionId = crypto.randomUUID();

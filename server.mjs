@@ -3,6 +3,7 @@ import { readFile, stat } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createContactHandler } from './contact.mjs';
+import { company } from './scripts/content.mjs';
 
 const project = fileURLToPath(new URL('./', import.meta.url));
 const root = resolve(project, 'dist');
@@ -20,7 +21,7 @@ const server = createServer(async (req, res) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'");
+  res.setHeader('Content-Security-Policy', `default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'${company.formKey ? ' https://api.web3forms.com' : ''}; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'`);
   try {
     const url = new URL(req.url, 'http://localhost');
     if (url.pathname === '/api/contact') return await contact(req, res);
