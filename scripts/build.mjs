@@ -11,7 +11,7 @@ if (!process.env.SITE_URL) console.warn(`SITE_URL is not set; canonical links an
 export const sections = ['top', 'services', 'about', 'contact'];
 const legalPages = ['privacy', 'gdpr'];
 const year = new Date().getUTCFullYear();
-const version = createHash('sha256').update(await readFile(root + 'public/styles.css')).update(await readFile(root + 'public/app.js')).digest('hex').slice(0, 10);
+const version = createHash('sha256').update(await readFile(root + 'public/styles.css')).update(await readFile(root + 'public/app.js')).update(await readFile(root + 'public/enquiry.js')).digest('hex').slice(0, 10);
 
 const escape = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const base = lang => (lang === 'en' ? '/en/' : '/');
@@ -69,9 +69,12 @@ const services = t => {
 };
 
 
+// The Sofia photo comes in AVIF (smallest) with WebP as fallback, in two widths; the browser picks.
+const photoSizes = '(max-width: 900px) min(640px, calc(100vw - 40px)), 600px';
+
 const about = t => {
   const a = t.about;
-  return `<section class="section about" id="about"><div class="wrap about-grid"><div class="about-copy"><p class="eyebrow">${a.label}</p><h2>${a.title}</h2>${a.body.map(p => `<p>${p}</p>`).join('')}</div><figure class="about-photo"><img src="/assets/sofia-wide.webp" width="1200" height="800" alt="${escape(a.photoAlt)}" loading="lazy" decoding="async"></figure></div><div class="wrap products"><h3 class="products-title">${a.productsTitle}</h3><div class="products-grid">${a.products.map(p => {
+  return `<section class="section about" id="about"><div class="wrap about-grid"><div class="about-copy"><p class="eyebrow">${a.label}</p><h2>${a.title}</h2>${a.body.map(p => `<p>${p}</p>`).join('')}</div><figure class="about-photo"><picture><source type="image/avif" srcset="/assets/sofia-800.avif 800w, /assets/sofia-1200.avif 1200w" sizes="${photoSizes}"><img src="/assets/sofia-800.webp" srcset="/assets/sofia-800.webp 800w, /assets/sofia-1200.webp 1200w" sizes="${photoSizes}" width="1200" height="800" alt="${escape(a.photoAlt)}" loading="lazy" decoding="async"></picture></figure></div><div class="wrap products"><h3 class="products-title">${a.productsTitle}</h3><div class="products-grid">${a.products.map(p => {
     const meta = productMeta[p.name];
     const host = new URL(meta.url).host;
     return `<a class="product product-${meta.slug}" href="${meta.url}" target="_blank" rel="noopener"><span class="product-logo"><img src="${meta.logo}" width="64" height="64" alt=""></span><span class="product-text"><strong class="product-name">${p.name}</strong><span class="product-tagline">${p.tagline}</span></span><span class="product-body">${p.body}</span><span class="product-link">${host} <span aria-hidden="true">↗</span></span></a>`;
@@ -109,11 +112,11 @@ export function render(lang, page = '') {
   const main = legalIndex < 0
     ? hero(t) + services(t) + about(t) + contactSection(t, lang)
     : legalPage(lang, page, t.legal[legalIndex]);
-  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">${csp}<title>${title}</title><meta name="description" content="${escape(description)}"><link rel="canonical" href="${url}"><link rel="alternate" hreflang="bg" href="${site + pathFor('bg', page)}"><link rel="alternate" hreflang="en" href="${site + pathFor('en', page)}"><link rel="alternate" hreflang="x-default" href="${site + pathFor('bg', page)}"><meta name="theme-color" content="#ffffff"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="preload" href="/assets/fonts/${font}-wght-normal.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="/styles.css?v=${version}"><meta property="og:type" content="website"><meta property="og:site_name" content="Velnovara Group"><meta property="og:locale" content="${lang === 'bg' ? 'bg_BG' : 'en_GB'}"><meta property="og:title" content="${escape(title)}"><meta property="og:description" content="${escape(description)}"><meta property="og:url" content="${url}"><meta property="og:image" content="${site}/assets/og-image.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">${legalIndex < 0 ? `<script type="application/ld+json">${structuredData(lang)}</script>` : ''}<script type="application/json" id="ui-strings">${strings}</script><script src="/app.js?v=${version}" defer></script></head><body class="page-${page || 'home'}"><a class="skip-link" href="#main">${t.skip}</a>${header(lang, page)}<main id="main">${main}</main>${footer(lang)}</body></html>`;
+  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">${csp}<title>${title}</title><meta name="description" content="${escape(description)}"><link rel="canonical" href="${url}"><link rel="alternate" hreflang="bg" href="${site + pathFor('bg', page)}"><link rel="alternate" hreflang="en" href="${site + pathFor('en', page)}"><link rel="alternate" hreflang="x-default" href="${site + pathFor('bg', page)}"><meta name="theme-color" content="#ffffff"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="preload" href="/assets/fonts/${font}-wght-normal.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="/styles.css?v=${version}"><meta property="og:type" content="website"><meta property="og:site_name" content="Velnovara Group"><meta property="og:locale" content="${lang === 'bg' ? 'bg_BG' : 'en_GB'}"><meta property="og:title" content="${escape(title)}"><meta property="og:description" content="${escape(description)}"><meta property="og:url" content="${url}"><meta property="og:image" content="${site}/assets/og-image.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">${legalIndex < 0 ? `<script type="application/ld+json">${structuredData(lang)}</script>` : ''}<script type="application/json" id="ui-strings">${strings}</script><script type="module" src="/app.js?v=${version}"></script></head><body class="page-${page || 'home'}"><a class="skip-link" href="#main">${t.skip}</a>${header(lang, page)}<main id="main">${main}</main>${footer(lang)}</body></html>`;
 }
 
-// GitHub Pages cannot send headers, so the page carries its own Content-Security-Policy.
-const csp = `<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'${company.formKey ? ' https://api.web3forms.com' : ''}; object-src 'none'; base-uri 'none'; form-action 'self'">`;
+// GitHub Pages cannot send headers, so the page carries its own Content-Security-Policy and referrer policy.
+const csp = `<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'${company.formKey ? ' https://api.web3forms.com' : ''}; object-src 'none'; base-uri 'none'; form-action 'self'"><meta name="referrer" content="strict-origin-when-cross-origin">`;
 
 // GitHub Pages cannot redirect, so the former pages become tiny pages that forward to their section.
 const movedPage = (to, lang) => `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url=${to}"><link rel="canonical" href="${site + to}"><title>Velnovara Group</title></head><body><a href="${to}">Velnovara Group</a></body></html>`;
@@ -127,6 +130,9 @@ const sitemap = () => {
 
 await rm(`${root}dist`, { recursive: true, force: true });
 await cp(`${root}public`, `${root}dist`, { recursive: true, filter: src => !src.endsWith('sofia-original.jpg') });
+// The module app.js imports enquiry.js; give that import the same version so browsers never mix old and new files.
+const appJs = await readFile(`${root}dist/app.js`, 'utf8');
+await writeFile(`${root}dist/app.js`, appJs.replace("from './enquiry.js'", `from './enquiry.js?v=${version}'`));
 for (const lang of ['bg', 'en']) {
   for (const page of ['', ...legalPages]) {
     const folder = `${root}dist${pathFor(lang, page)}`;

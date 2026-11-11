@@ -12,9 +12,8 @@ export const company = {
   postal: { street: { bg: 'ул. „Градина“ № 53', en: '53 Gradina St.' }, code: '1616', city: { bg: 'София', en: 'Sofia' }, country: { bg: 'България', en: 'Bulgaria' } },
   contactEmail: 'support@velnovaragroup.eu', // public address; Porkbun forwards it to velnovaragroup@gmail.com
   contactPhone: '+359 896 726 277',
-  // Web3Forms access key for the contact form on GitHub Pages. It is meant to be public
-  // (it only lets the form deliver to the inbox registered at web3forms.com).
-  // Empty = the form posts to the Node server instead (npm start / Docker).
+  // Web3Forms access key for the contact form. It is meant to be public: it only lets the
+  // form deliver to the inbox registered at web3forms.com (velnovaragroup@gmail.com).
   formKey: '00935146-dedd-4ffe-bcf2-4ccaf908e2fd'
 };
 
@@ -137,7 +136,6 @@ export const content = {
       success: 'Благодарим ви! Запитването е изпратено и ще се свържем с вас скоро.',
       error: 'Съобщението не беше изпратено. Моля, опитайте отново.',
       unavailable: 'Формулярът временно не е достъпен. Опитайте отново по-късно или ни пишете на support@velnovaragroup.eu.',
-      invalid: 'Въведете име, валиден имейл и съобщение от поне 10 знака.',
       rate: 'Твърде много опити за кратко време. Моля, опитайте отново след няколко минути.'
     },
 
@@ -270,7 +268,6 @@ export const content = {
       success: 'Thank you! Your enquiry has been sent and we will be in touch soon.',
       error: 'Your message was not sent. Please try again.',
       unavailable: 'The form is temporarily unavailable. Please try again later or email us at support@velnovaragroup.eu.',
-      invalid: 'Enter your name, a valid email address and a message of at least 10 characters.',
       rate: 'Too many attempts in a short time. Please try again in a few minutes.'
     },
 

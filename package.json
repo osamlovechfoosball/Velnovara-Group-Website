@@ -11,6 +11,7 @@
     "start": "node --env-file-if-exists=.env server.mjs",
     "dev": "node --env-file-if-exists=.env scripts/build.mjs && node --env-file-if-exists=.env server.mjs",
     "test": "node --test tests/*.test.mjs",
-    "check": "node --check server.mjs && node --check public/app.js && node scripts/build.mjs && node --test tests/*.test.mjs"
+    "check": "node --check server.mjs && node --check public/app.js && node --check public/enquiry.js && node scripts/build.mjs && node --test tests/*.test.mjs",
+    "test:browser": "node tests/browser-check.cjs"
   }
 }

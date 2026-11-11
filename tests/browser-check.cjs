@@ -1,4 +1,5 @@
-// Optional browser QA: set PLAYWRIGHT_MODULE to your installed Playwright module.
+// Browser QA (runs on GitHub; locally: npm install --no-save playwright, npx playwright install chromium,
+// then npm start in one terminal and npm run test:browser in another).
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -8,7 +9,7 @@ const path = require('node:path');
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
-  page.on('console', msg => { if (msg.type() === 'error' && !msg.text().includes('503')) errors.push(msg.text()); });
+  page.on('console', msg => { if (msg.type() === 'error' && !msg.text().includes('status of 500')) errors.push(msg.text()); });
   const origin = process.env.TEST_ORIGIN || 'http://localhost:3000';
   const routes = ['/', '/en/', '/privacy/', '/gdpr/', '/en/privacy/', '/en/gdpr/'];
   const folder = path.join(__dirname, '../test-results');
@@ -57,11 +58,10 @@ const path = require('node:path');
     }
   }
 
-  // Former pages redirect to their section.
+  // Former pages forward to their section (GitHub Pages cannot redirect, so they are small forwarding pages).
   for (const [from, to] of [['/services/', '/#services'], ['/en/about/', '/en/#about'], ['/contact/', '/#contact']]) {
-    const response = await page.request.get(origin + from, { maxRedirects: 0 });
-    assert.equal(response.status(), 301, from);
-    assert.equal(response.headers().location, to, from);
+    await page.goto(origin + from);
+    await page.waitForURL(url => url.pathname + url.hash === to);
   }
   assert.equal((await page.request.get(origin + '/not-a-page/')).status(), 404);
 
@@ -76,8 +76,9 @@ const path = require('node:path');
   assert.equal(await page.locator('.menu-toggle').getAttribute('aria-expanded'), 'false');
   await page.waitForTimeout(800);
   const aboutBefore = await page.locator('#about').evaluate(el => el.getBoundingClientRect().top);
-  await page.locator('.menu-toggle').click();
-  await page.locator('.language-switch a').click();
+  // dispatchEvent: Playwright's click() first scrolls the sticky header "into view", which moves the page.
+  await page.locator('.menu-toggle').dispatchEvent('click');
+  await page.locator('.language-switch a').dispatchEvent('click');
   await page.waitForURL(url => url.pathname === '/en/');
   await page.waitForLoadState('load');
   // The visitor stays on the same section after switching language.
@@ -93,25 +94,31 @@ const path = require('node:path');
   assert.equal(await page.locator('.service:not([hidden])').count(), 1);
   assert.ok(await page.locator('#ai').isVisible());
 
-  // Form states, with the endpoint mocked so no email is ever sent.
+  // Form states, with Web3Forms mocked so no email is ever sent.
+  const web3forms = (status, body) => route => route.request().method() === 'OPTIONS'
+    ? route.fulfill({ status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'POST', 'Access-Control-Allow-Headers': 'Content-Type, Accept' } })
+    : route.fulfill({ status, contentType: 'application/json', headers: { 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify(body) });
+  let sent = null;
+  await page.route('https://api.web3forms.com/**', route => { if (route.request().method() === 'POST') sent = route.request().postDataJSON(); return web3forms(200, { success: true })(route); });
   await page.locator('#name').fill('Иван Петров');
   await page.locator('#email').fill('client@example.com');
   await page.locator('#message').fill('Бих искал да автоматизирам работата с фактури.');
-  await page.route('**/api/contact', route => route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }));
   await page.locator('#contact-form button[type="submit"]').click();
   await page.locator('#form-status[data-state="success"]').waitFor();
   assert.equal(await page.locator('#name').inputValue(), '');
-  await page.unroute('**/api/contact');
-  await page.route('**/api/contact', route => route.fulfill({ status: 503, contentType: 'application/json', body: '{"ok":false}' }));
+  assert.equal(sent.email, 'client@example.com');
+  assert.match(sent.access_key, /^[0-9a-f-]{36}$/);
+  await page.unroute('https://api.web3forms.com/**');
+  await page.route('https://api.web3forms.com/**', web3forms(500, { success: false }));
   await page.locator('#name').fill('Иван Петров');
   await page.locator('#email').fill('client@example.com');
   await page.locator('#message').fill('Бих искал да автоматизирам работата с фактури.');
   await page.locator('#contact-form button[type="submit"]').click();
   await page.locator('#form-status[data-state="error"]').waitFor();
-  assert.ok((await page.locator('#form-status').textContent()).includes('по-късно'));
+  assert.ok((await page.locator('#form-status').textContent()).includes('не беше изпратено'));
   assert.equal(await page.locator('#name').inputValue(), 'Иван Петров');
 
   assert.deepEqual(errors, []);
   await browser.close();
-  console.log('PASS: 6 routes × 5 widths, links and fragments, redirects, mobile menu, language switch, service tabs, form states.');
+  console.log('PASS: 6 routes × 5 widths, links and fragments, forwarding pages, mobile menu, language switch, service tabs, form states.');
 })().catch(e => { console.error(e); process.exit(1); });

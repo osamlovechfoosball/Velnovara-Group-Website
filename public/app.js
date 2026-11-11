@@ -1,3 +1,8 @@
+import { sendEnquiry } from './enquiry.js';
+
+// GitHub Pages cannot forbid framing with a header, so if another site embeds this page, leave its frame.
+if (window.top !== window.self) window.top.location.href = window.location.href;
+
 const strings = JSON.parse(document.querySelector('#ui-strings').textContent);
 const menu = document.querySelector('.menu-toggle');
 const nav = document.querySelector('#main-nav');
@@ -29,16 +34,7 @@ languageLink?.addEventListener('click', () => {
 });
 let savedPlace = null;
 try { savedPlace = JSON.parse(sessionStorage.getItem(scrollKey)); sessionStorage.removeItem(scrollKey); } catch {}
-if (savedPlace) {
-  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-  const restore = () => {
-    const section = document.getElementById(savedPlace.id);
-    if (section) window.scrollTo({ top: section.offsetTop + savedPlace.ratio * section.offsetHeight, behavior: 'instant' });
-  };
-  restore();
-  // Fonts and images can shift the layout slightly once they load; settle on the same spot.
-  window.addEventListener('load', restore, { once: true });
-}
+if (savedPlace && 'scrollRestoration' in history) history.scrollRestoration = 'manual';
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -134,8 +130,6 @@ if (form) {
   const button = form.querySelector('button[type="submit"]');
   const buttonContent = [...button.childNodes].map(node => node.cloneNode(true));
 
-  let startedAt = Date.now();
-  let submissionId = crypto.randomUUID();
   form.addEventListener('submit', async event => {
     event.preventDefault();
     if (!form.reportValidity() || button.disabled) return;
@@ -143,40 +137,24 @@ if (form) {
     button.textContent = strings.sending;
     status.textContent = '';
     status.removeAttribute('data-state');
-    try {
-      const data = Object.fromEntries(new FormData(form));
-      const language = document.documentElement.lang;
-      // A filled honeypot means a bot: show success and send nothing.
-      if (data.website) { form.reset(); status.textContent = strings.success; status.dataset.state = 'success'; return; }
-      let response, sent;
-      if (strings.formKey) {
-        // Static hosting (GitHub Pages): Web3Forms delivers the message to the company inbox.
-        response = await fetch('https://api.web3forms.com/submit', {
-          method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({ access_key: strings.formKey, subject: strings.subject, from_name: 'Velnovara Group website', name: data.name, email: data.email, message: data.message, language, botcheck: '' }),
-          signal: AbortSignal.timeout(20000)
-        });
-        sent = (await response.json()).success === true;
-      } else {
-        // Node server (npm start / Docker): server.mjs sends through Resend.
-        response = await fetch('/api/contact', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...data, language, startedAt, submissionId }),
-          signal: AbortSignal.timeout(20000)
-        });
-        sent = (await response.json()).ok === true;
-      }
-      if (!response.ok || !sent) {
-        // The browser has already checked the fields, so a Web3Forms 400 means a setup problem, not visitor input.
-        const key = response.status === 503 ? 'unavailable' : response.status === 429 ? 'rate' : response.status === 400 && !strings.formKey ? 'invalid' : 'error';
-        throw new Error(key);
-      }
-      form.reset(); startedAt = Date.now(); submissionId = crypto.randomUUID();
-      status.textContent = strings.success;
-      status.dataset.state = 'success';
-    } catch (error) {
-      status.textContent = strings[error.message] || strings.error;
-      status.dataset.state = 'error';
-    } finally { button.disabled = false; button.replaceChildren(...buttonContent.map(node => node.cloneNode(true))); }
+    const outcome = await sendEnquiry({ data: Object.fromEntries(new FormData(form)), language: document.documentElement.lang, strings });
+    if (outcome === 'success') form.reset();
+    status.textContent = strings[outcome] || strings.error;
+    status.dataset.state = outcome === 'success' ? 'success' : 'error';
+    button.disabled = false;
+    button.replaceChildren(...buttonContent.map(node => node.cloneNode(true)));
   });
+}
+
+// Restore the language-switch position last, once the service tabs have hidden their other
+// panels and the page has its final height. Fonts and images can still shift it slightly
+// while loading, so settle on the same spot again when everything has loaded.
+if (savedPlace) {
+  const restore = () => {
+    const section = document.getElementById(savedPlace.id);
+    if (section) window.scrollTo({ top: section.offsetTop + savedPlace.ratio * section.offsetHeight, behavior: 'instant' });
+  };
+  restore();
+  if (document.readyState === 'complete') requestAnimationFrame(restore);
+  else window.addEventListener('load', restore, { once: true });
 }

@@ -8,6 +8,29 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-          cache: npm
-      - run: npm ci
       - run: npm run check
+
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm run build
+        env:
+          SITE_URL: https://velnovaragroup.eu
+      - run: npm install --no-save playwright@1.64.1
+      - run: npx playwright install --with-deps chromium
+      - name: Start the local preview server
+        run: |
+          npm start &
+          for i in $(seq 1 30); do curl -sf http://localhost:3000/ > /dev/null && exit 0; sleep 1; done
+          echo "Server did not start"; exit 1
+      - run: npm run test:browser
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: test-results/
+          if-no-files-found: ignore

@@ -7,8 +7,8 @@
 - Source: https://commons.wikimedia.org/wiki/File:Cathedral_Saint_Alexander_Nevsky_(23997168458).jpg
 - Original: https://upload.wikimedia.org/wikipedia/commons/7/79/Cathedral_Saint_Alexander_Nevsky_%2823997168458%29.jpg
 - Licence: Creative Commons Attribution 2.0 Generic — https://creativecommons.org/licenses/by/2.0/
-- Changes: crop, resize, WebP compression, and reduced saturation applied via CSS.
-- Website asset: `public/assets/sofia-wide.webp`
+- Changes: crop, resize, AVIF/WebP compression, and reduced saturation applied via CSS.
+- Website assets: `public/assets/sofia-800` and `sofia-1200` (AVIF and WebP)
 
 ## Brand
 

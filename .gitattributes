@@ -10,3 +10,6 @@
 *.png binary
 *.jpg binary
 *.webp binary
+*.cjs text eol=lf
+*.avif binary
+*.woff2 binary
