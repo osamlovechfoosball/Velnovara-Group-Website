@@ -11,7 +11,7 @@ jobs:
       - run: npm run check
 
   browser:
-    # Pinned: Playwright's --with-deps installer supports Ubuntu 24.04; ubuntu-latest moved to 26.
+    # Uses the Google Chrome preinstalled on GitHub's Ubuntu 24.04 image instead of downloading a browser.
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -22,13 +22,14 @@ jobs:
         env:
           SITE_URL: https://velnovaragroup.eu
       - run: npm install --no-save playwright@1.64.1
-      - run: npx playwright install --with-deps chromium
       - name: Start the local preview server
         run: |
           npm start &
           for i in $(seq 1 30); do curl -sf http://localhost:3000/ > /dev/null && exit 0; sleep 1; done
           echo "Server did not start"; exit 1
       - run: npm run test:browser
+        env:
+          BROWSER_EXECUTABLE: /usr/bin/google-chrome
       - if: always()
         uses: actions/upload-artifact@v4
         with:

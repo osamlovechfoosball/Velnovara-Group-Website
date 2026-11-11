@@ -79,7 +79,7 @@ npm run check
 
 This checks JavaScript syntax, builds both languages and runs the tests: the contact form's Web3Forms requests and every failure case (`tests/enquiry.test.mjs`), and the built pages' security policy, form key, GitHub Pages files and absence of secrets (`tests/build.test.mjs`).
 
-On every push, GitHub Actions (`.github/workflows/ci.yml`) also runs `tests/browser-check.cjs` in a real browser: 6 pages at 5 screen widths, links, forwarding pages, mobile menu, language switch, service tabs and form states, with Web3Forms mocked so no email is sent. Screenshots are kept as a downloadable artifact of each run. To run it locally: `npm install --no-save playwright`, `npx playwright install chromium`, `npm start`, then `npm run test:browser` in a second terminal.
+On every push, GitHub Actions (`.github/workflows/ci.yml`) also runs `tests/browser-check.cjs` in a real browser: 6 pages at 5 screen widths, links, forwarding pages, mobile menu, language switch, service tabs and form states, with Web3Forms mocked so no email is sent. Screenshots are kept as a downloadable artifact of each run. To run it locally: `npm install --no-save playwright`, `npm start`, then `npm run test:browser` in a second terminal, with `BROWSER_EXECUTABLE` set to an installed Chrome or Edge.
 
 ## Publish the repository to GitHub
 

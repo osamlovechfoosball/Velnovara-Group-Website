@@ -1,5 +1,5 @@
-// Browser QA (runs on GitHub; locally: npm install --no-save playwright, npx playwright install chromium,
-// then npm start in one terminal and npm run test:browser in another).
+// Browser QA (runs on GitHub with its preinstalled Chrome; locally: npm install --no-save playwright and set
+// BROWSER_EXECUTABLE to Chrome or Edge, then npm start in one terminal and npm run test:browser in another).
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
