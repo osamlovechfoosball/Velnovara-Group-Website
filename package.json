@@ -3,11 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
-    "build": "node scripts/build.mjs",
+    "build": "node --env-file-if-exists=.env scripts/build.mjs",
     "start": "node --env-file-if-exists=.env server.mjs",
-    "dev": "node scripts/build.mjs && node --env-file-if-exists=.env server.mjs",
+    "dev": "node --env-file-if-exists=.env scripts/build.mjs && node --env-file-if-exists=.env server.mjs",
     "test": "node --test tests/*.test.mjs",
     "check": "node --check server.mjs && node --check public/app.js && node scripts/build.mjs && node --test tests/*.test.mjs"
   }

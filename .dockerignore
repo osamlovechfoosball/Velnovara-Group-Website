@@ -5,3 +5,9 @@ node_modules
 dist
 test-results
 public/assets/sofia-original.jpg
+design-previews
+UI-previews-*
+UI-team-previews-*
+brand
+tests
+*.md

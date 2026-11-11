@@ -11,3 +11,8 @@ test-results/
 public/assets/sofia-original.jpg
 
 design-previews/
+
+# Old design screenshots and unused artwork: kept locally, not part of the site.
+UI-previews-*/
+UI-team-previews-*/
+brand/unused/

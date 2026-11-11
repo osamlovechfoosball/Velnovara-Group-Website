@@ -10,45 +10,95 @@ const path = require('node:path');
   page.on('pageerror', e => errors.push(e.message));
   page.on('console', msg => { if (msg.type() === 'error' && !msg.text().includes('503')) errors.push(msg.text()); });
   const origin = process.env.TEST_ORIGIN || 'http://localhost:3000';
-  const routes = ['/', '/services/', '/about/', '/contact/', '/en/', '/en/services/', '/en/about/', '/en/contact/'];
+  const routes = ['/', '/en/', '/privacy/', '/gdpr/', '/en/privacy/', '/en/gdpr/'];
   const folder = path.join(__dirname, '../test-results');
   fs.mkdirSync(folder, { recursive: true });
-  for (const width of [1440, 768, 390, 320]) {
+  const links = new Set();
+
+  for (const width of [1440, 1024, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 950 });
     for (const route of routes) {
       const response = await page.goto(origin + route);
       assert.equal(response.status(), 200, route);
       await page.waitForLoadState('networkidle');
-      assert.equal(await page.locator('h1').count(), 1);
+      await page.locator('img').evaluateAll(imgs => imgs.forEach(img => { img.loading = 'eager'; }));
+      await page.waitForFunction(() => [...document.images].every(img => img.complete && img.naturalWidth > 0));
+      assert.equal(await page.locator('h1').count(), 1, `One H1: ${route}`);
       assert.equal(await page.locator('html').getAttribute('lang'), route.startsWith('/en') ? 'en' : 'bg');
-      assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), `Overflow: ${route}, ${width}px`);
-      assert.equal(await page.locator('img').evaluateAll(imgs => imgs.every(img => img.complete && img.naturalWidth > 0)), true, `Images ${route}`);
-      assert.equal(await page.locator('.main-nav>a').count(), 4);
-      for (const photo of await page.locator('.sofia-photo img').all()) {
-        const ratios = await photo.evaluate(img => ({ rendered: img.clientWidth / img.clientHeight, intrinsic: img.naturalWidth / img.naturalHeight }));
-        assert.ok(Math.abs(ratios.rendered - ratios.intrinsic) < 0.02, `Photo distorted: ${route}, ${width}px`);
+      assert.equal(await page.locator('.main-nav>a[data-section]').count(), 4);
+      const result = await page.evaluate(() => {
+        const ids = [...document.querySelectorAll('[id]')].map(e => e.id);
+        return {
+          overflow: document.documentElement.scrollWidth > innerWidth + 1,
+          clipped: [...document.querySelectorAll('main h1, main h2')].some(h => h.scrollWidth > h.clientWidth + 1),
+          duplicates: ids.filter((id, i) => ids.indexOf(id) !== i),
+          unnamed: [...document.querySelectorAll('a,button')].filter(e => !e.textContent.trim() && !e.getAttribute('aria-label')).length,
+          links: [...document.querySelectorAll('a[href]')].map(e => e.href)
+        };
+      });
+      assert.ok(!result.overflow, `Overflow: ${route}, ${width}px`);
+      assert.ok(!result.clipped, `Clipped heading: ${route}, ${width}px`);
+      assert.deepEqual(result.duplicates, [], `Duplicate ids: ${route}`);
+      assert.equal(result.unnamed, 0, `Unnamed controls: ${route}`);
+      result.links.filter(href => href.startsWith(origin)).forEach(href => links.add(href));
+      if ((width === 1440 || width === 390) && (route === '/' || route === '/en/')) {
+        await page.screenshot({ path: path.join(folder, `${width === 1440 ? 'desktop' : 'mobile'}-${route === '/' ? 'bg' : 'en'}.png`), fullPage: true });
       }
-      if (width === 1440 && ['/services/', '/about/'].includes(route)) await page.screenshot({ path: path.join(folder, `desktop-${route.split('/')[1]}.png`), fullPage: true });
-      if (width === 1440 && ['/', '/en/', '/contact/'].includes(route)) await page.screenshot({ path: path.join(folder, `desktop-${route === '/' ? 'bg' : route === '/en/' ? 'en' : 'contact'}.png`), fullPage: true });
-      if (width === 390 && route === '/') await page.screenshot({ path: path.join(folder, 'mobile-bg.png'), fullPage: true });
     }
   }
+
+  // Every internal link resolves, and every fragment exists on its page.
+  for (const href of links) {
+    const url = new URL(href);
+    assert.equal((await page.request.get(url.origin + url.pathname)).status(), 200, href);
+    if (url.hash) {
+      await page.goto(url.origin + url.pathname);
+      assert.equal(await page.locator(`[id="${url.hash.slice(1)}"]`).count(), 1, href);
+    }
+  }
+
+  // Former pages redirect to their section.
+  for (const [from, to] of [['/services/', '/#services'], ['/en/about/', '/en/#about'], ['/contact/', '/#contact']]) {
+    const response = await page.request.get(origin + from, { maxRedirects: 0 });
+    assert.equal(response.status(), 301, from);
+    assert.equal(response.headers().location, to, from);
+  }
+  assert.equal((await page.request.get(origin + '/not-a-page/')).status(), 404);
+
+  // Mobile menu, scroll navigation and language switching.
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto(origin + '/services/');
-  await page.getByRole('button', { name: 'Меню' }).click();
+  await page.goto(origin + '/');
+  await page.locator('.menu-toggle').click();
   assert.equal(await page.locator('.menu-toggle').getAttribute('aria-expanded'), 'true');
+  assert.ok(await page.locator('.main-nav').isVisible());
+  await page.locator('.main-nav a[data-section="about"]').click();
+  await page.waitForURL('**/#about');
+  assert.equal(await page.locator('.menu-toggle').getAttribute('aria-expanded'), 'false');
+  await page.waitForTimeout(800);
+  const aboutBefore = await page.locator('#about').evaluate(el => el.getBoundingClientRect().top);
+  await page.locator('.menu-toggle').click();
   await page.locator('.language-switch a').click();
-  await page.waitForURL('**/en/services/');
-  await page.getByRole('button', { name: 'Menu' }).click();
+  await page.waitForURL(url => url.pathname === '/en/');
+  await page.waitForLoadState('load');
+  // The visitor stays on the same section after switching language.
+  const aboutAfter = await page.locator('#about').evaluate(el => el.getBoundingClientRect().top);
+  assert.ok(Math.abs(aboutAfter - aboutBefore) < 60, `Language switch kept position: ${aboutBefore} → ${aboutAfter}`);
+  await page.locator('.menu-toggle').click();
   await page.keyboard.press('Escape');
   assert.equal(await page.locator('.menu-toggle').getAttribute('aria-expanded'), 'false');
-  await page.goto(origin + '/contact/');
+
+  // Services show one at a time.
+  await page.goto(origin + '/');
+  await page.locator('#tab-ai').click();
+  assert.equal(await page.locator('.service:not([hidden])').count(), 1);
+  assert.ok(await page.locator('#ai').isVisible());
+
+  // Form states, with the endpoint mocked so no email is ever sent.
   await page.locator('#name').fill('Иван Петров');
   await page.locator('#email').fill('client@example.com');
   await page.locator('#message').fill('Бих искал да автоматизирам работата с фактури.');
-  // Never transmit an email from UI QA: mock the local endpoint.
   await page.route('**/api/contact', route => route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }));
-  await page.getByRole('button', { name: 'Изпрати запитване' }).click();
+  await page.locator('#contact-form button[type="submit"]').click();
   await page.locator('#form-status[data-state="success"]').waitFor();
   assert.equal(await page.locator('#name').inputValue(), '');
   await page.unroute('**/api/contact');
@@ -56,11 +106,12 @@ const path = require('node:path');
   await page.locator('#name').fill('Иван Петров');
   await page.locator('#email').fill('client@example.com');
   await page.locator('#message').fill('Бих искал да автоматизирам работата с фактури.');
-  await page.getByRole('button', { name: 'Изпрати запитване' }).click();
+  await page.locator('#contact-form button[type="submit"]').click();
   await page.locator('#form-status[data-state="error"]').waitFor();
-  assert.ok((await page.locator('#form-status').textContent()).includes('velnovaragroup@gmail.com'));
+  assert.ok((await page.locator('#form-status').textContent()).includes('по-късно'));
   assert.equal(await page.locator('#name').inputValue(), 'Иван Петров');
+
   assert.deepEqual(errors, []);
   await browser.close();
-  console.log('PASS: 8 routes × 4 widths, images, language switching, mobile menu, success and error form states.');
+  console.log('PASS: 6 routes × 5 widths, links and fragments, redirects, mobile menu, language switch, service tabs, form states.');
 })().catch(e => { console.error(e); process.exit(1); });

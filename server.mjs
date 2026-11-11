@@ -10,16 +10,23 @@ const port = Number(process.env.PORT || 3000);
 const host = process.env.HOST || '127.0.0.1';
 const env = { ...process.env, PUBLIC_ORIGIN: process.env.PUBLIC_ORIGIN || `http://localhost:${port}`, CONTACT_TO: process.env.CONTACT_TO || 'velnovaragroup@gmail.com' };
 const contact = createContactHandler({ env });
-const mime = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.png': 'image/png', '.txt': 'text/plain; charset=utf-8' };
+const mime = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.woff2': 'font/woff2', '.xml': 'application/xml; charset=utf-8', '.txt': 'text/plain; charset=utf-8' };
+// The former separate pages now live as sections of the one-page site.
+const movedTo = pathname => {
+  const match = pathname.match(/^\/(en\/)?(services|about|contact)\/?$/);
+  return match && `/${match[1] || ''}#${match[2]}`;
+};
 const server = createServer(async (req, res) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'");
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'");
   try {
     const url = new URL(req.url, 'http://localhost');
     if (url.pathname === '/api/contact') return await contact(req, res);
     if (!['GET', 'HEAD'].includes(req.method)) { res.writeHead(405, { Allow: 'GET, HEAD' }); return res.end(); }
+    const redirect = movedTo(url.pathname);
+    if (redirect) { res.writeHead(301, { Location: redirect }); return res.end(); }
     const pathname = decodeURIComponent(url.pathname);
     if (pathname.includes('\0') || pathname.split('/').some(part => part.startsWith('.')) || pathname.includes('\\')) { res.writeHead(404); return res.end(); }
     let file = resolve(root, `.${pathname}`);

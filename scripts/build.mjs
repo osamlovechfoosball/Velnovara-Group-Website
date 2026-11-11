@@ -1,62 +1,134 @@
-import { mkdir, readFile, writeFile, cp } from 'node:fs/promises';
+import { mkdir, writeFile, cp, rm, readFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { content } from './content.mjs';
+import { content, company } from './content.mjs';
+import { legalPage } from './legal.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-export const pages = ['', 'services', 'about', 'contact'];
-const ids = ['automation', 'ai', 'platforms', 'apis', 'websites'];
+const site = (process.env.SITE_URL || 'https://velnovaragroup.eu').replace(/\/$/, '');
+if (!process.env.SITE_URL) console.warn(`SITE_URL is not set; canonical links and the sitemap use ${site}.`);
+
+export const sections = ['top', 'services', 'about', 'contact'];
+const legalPages = ['privacy', 'gdpr'];
+const year = new Date().getUTCFullYear();
+const version = createHash('sha256').update(await readFile(root + 'public/styles.css')).update(await readFile(root + 'public/app.js')).digest('hex').slice(0, 10);
+
 const escape = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-const pathFor = (lang, page = '') => `${lang === 'en' ? '/en' : ''}/${page}${page ? '/' : ''}`;
-const icon = (i) => `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">${[
+const base = lang => (lang === 'en' ? '/en/' : '/');
+const pathFor = (lang, page = '') => base(lang) + (page ? `${page}/` : '');
+const svg = (paths, size = 32) => `<svg viewBox="0 0 ${size} ${size}" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
+
+const serviceIcons = [
   '<path d="M6 9h20v14H6zM11 3v6m10-6v6M11 23v6m10-6v6M3 13h3m-3 6h3m20-6h3m-3 6h3"/><path d="m12 16 3 3 5-6"/>',
-  '<path d="M16 3 27 9v14l-11 6L5 23V9zM5 9l11 7 11-7M16 16v13"/><path d="m10 6 12 7"/>',
-  '<rect x="4" y="5" width="24" height="22" rx="2"/><path d="M4 12h24M11 12v15M8 8h1m3 0h1m3 0h1"/>',
-  '<path d="m12 7-9 9 9 9m8-18 9 9-9 9M18 4l-4 24"/>',
-  '<rect x="3" y="5" width="26" height="22" rx="2"/><path d="M3 12h26M7 8h1m3 0h1m3 0h1M7 17h10m-10 5h16"/>'
-][i]}</svg>`;
-const brand = (lang, dark = false) => `<a class="brand" href="${pathFor(lang)}" aria-label="Velnovara Group — ${content[lang].nav[0]}"><img src="/assets/${dark ? 'mark-light.svg' : 'mark.svg'}" width="52" height="39" alt=""><span class="brand-type"><span>VELNOVARA</span><span class="brand-group">GROUP</span></span></a>`;
+  '<path d="M16 3 27 9v14l-11 6L5 23V9zM5 9l11 7 11-7M16 16v13"/>',
+  '<rect x="4" y="5" width="24" height="22" rx="2"/><path d="M4 12h24M11 12v15M8 8.5h1m3 0h1m3 0h1"/>',
+  '<path d="m11 8-8 8 8 8m10-16 8 8-8 8M18 5l-4 22"/>',
+  '<rect x="3" y="5" width="26" height="22" rx="2"/><path d="M3 12h26M7 8.5h1m3 0h1m3 0h1M7 17h10m-10 5h16"/>'
+];
+// Velnovara's own products: logo file and public site, keyed by the name used in content.mjs.
+const productMeta = {
+  OutboundFinder: { logo: '/assets/products/outboundfinder.svg', url: 'https://outboundfinder.eu', slug: 'outboundfinder' },
+  Resido: { logo: '/assets/products/resido.webp', url: 'https://residoco.com', slug: 'resido' }
+};
 
-function servicesCards(t, lang) {
-  return `<div class="service-grid">${t.services.map((s, i) => `<a class="service-card" href="${pathFor(lang, 'services')}#${ids[i]}"><div class="service-top">${icon(i)}<h3>${s[0]}</h3></div><p>${s[1]}</p><span class="service-link">${t.more}</span></a>`).join('')}</div>`;
-}
-const photograph = t => `<figure class="sofia-photo"><img src="/assets/sofia.webp" width="1400" height="1000" alt="${t.photoAlt}" loading="lazy"><figcaption>${t.photoCaption}</figcaption></figure>`;
-const cta = (t, lang) => `<section class="cta wrap"><div><span class="eyebrow">${t.aboutLabel}</span><h2>${t.ctaTitle}</h2><p>${t.ctaText}</p></div><a class="button" href="${pathFor(lang, 'contact')}">${t.talk}</a></section>`;
-const process = t => `<section class="section wrap"><div class="section-heading"><span class="eyebrow">${t.processLabel}</span><h2>${t.processTitle}</h2></div><ol class="process">${t.process.map(p => `<li><h3>${p[0]}</h3><p>${p[1]}</p></li>`).join('')}</ol></section>`;
+const brand = lang =>
+  `<a class="brand" href="${base(lang)}#top" aria-label="Velnovara Group — ${content[lang].home}"><img src="/assets/mark.svg" width="46" height="34" alt=""><span class="brand-type"><span class="brand-name">VELNOVARA</span><span class="brand-group">GROUP</span><span class="brand-slogan">${content[lang].slogan}</span></span></a>`;
 
-function home(t, lang) {
-  return `<section class="hero"><div class="wrap hero-inner"><div class="hero-copy"><p class="eyebrow">${t.eyebrow}</p><h1>${t.hero[0]}<br><span>${t.hero[1]}</span></h1></div><div class="hero-intro"><p class="lead">${t.intro}</p><div class="actions"><a class="button" href="${pathFor(lang, 'services')}">${t.explore}</a><a class="text-link" href="${pathFor(lang, 'contact')}">${t.talk}</a></div></div></div></section>
-  <section class="wrap home-story"><div class="story-copy"><span class="eyebrow">${t.location}</span><h2>${t.aboutHomeTitle}</h2><p>${t.aboutIntro}</p><a class="text-link" href="${pathFor(lang, 'about')}">${t.aboutMore}</a></div>${photograph(t)}</section>
-  <section class="section services-overview"><div class="wrap"><div class="section-heading heading-split"><div><span class="eyebrow">${t.servicesLabel}</span><h2>${t.servicesTitle}</h2></div><p>${t.servicesIntro}</p></div>${servicesCards(t, lang)}</div></section>${process(t)}${cta(t, lang)}`;
-}
+// Header links use the rolling-text effect: the word rolls up and a gold copy rolls in from below.
+const navLinks = (lang, roll = false) =>
+  content[lang].nav.map((label, i) => `<a href="${base(lang)}#${sections[i]}" data-section="${sections[i]}">${roll ? `<span class="roll" data-text="${label}"><span>${label}</span></span>` : label}</a>`).join('');
 
-function services(t, lang) {
-  return `<section class="page-intro wrap"><div><span class="eyebrow">${t.servicesLabel}</span><h1>${t.servicesPageTitle}</h1></div><p class="lead">${t.servicesPageIntro}</p></section><div class="wrap services-layout"><nav class="service-nav" aria-label="${t.allServices}">${t.services.map((service, i) => `<a href="#${ids[i]}">${service[0]}</a>`).join('')}</nav><div class="service-details">${t.services.map((service, i) => `<section class="service-detail" id="${ids[i]}"><div class="detail-title">${icon(i)}<h2>${service[0]}</h2></div><p class="detail-description">${service[1]}</p><ul class="feature-list">${service[2].map(x => `<li>${x}</li>`).join('')}</ul><a class="text-link" href="${pathFor(lang, 'contact')}">${t.discuss}</a></section>`).join('')}</div></div>${process(t)}${cta(t, lang)}`;
-}
-
-function about(t, lang) {
-  return `<section class="page-intro wrap"><div><span class="eyebrow">${t.aboutLabel}</span><h1>${t.aboutTitle}</h1></div><p class="lead">${t.aboutIntro}</p></section><section class="wrap about-story">${photograph(t)}<div><span class="eyebrow">${t.location}</span><h2>${t.aboutHomeTitle}</h2><p>${t.aboutBody}</p><a class="text-link" href="${pathFor(lang, 'services')}">${t.allServices}</a></div></section><section class="section wrap"><div class="section-heading"><span class="eyebrow">${t.principlesLabel}</span></div><div class="principles">${t.principles.map(p => `<article><h2>${p[0]}</h2><p>${p[1]}</p></article>`).join('')}</div></section>${cta(t, lang)}`;
-}
-function contact(t) {
-  return `<section class="contact-layout wrap"><div class="contact-copy"><span class="eyebrow">${t.nav[3]}</span><h1>${t.contactTitle}</h1><p class="lead">${t.contactIntro}</p><div class="contact-info"><div><span class="eyebrow">${t.emailLabel}</span><a class="contact-email" href="mailto:velnovaragroup@gmail.com">velnovaragroup@gmail.com</a></div><div><span class="eyebrow">${t.locationLabel}</span><p>${t.location}</p></div></div></div><form id="contact-form" class="contact-form"><h2>${t.formTitle}</h2><label for="name">${t.name}</label><input id="name" name="name" autocomplete="name" minlength="2" maxlength="100" required placeholder="${t.namePlaceholder}"><label for="email">${t.email}</label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" required placeholder="${t.emailPlaceholder}"><label for="message">${t.message}</label><textarea id="message" name="message" minlength="10" maxlength="5000" rows="6" required placeholder="${t.messagePlaceholder}"></textarea><div class="honeypot" aria-hidden="true"><label for="website">Website</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div><p class="privacy-note">${t.privacyNote}</p><button class="button" type="submit">${t.send}</button><p class="form-status" id="form-status" role="status" aria-live="polite"></p><noscript><p>${t.unavailable}</p></noscript></form></section>`;
-}
-export function render(lang, page) {
+const header = (lang, page) => {
   const t = content[lang];
-  const i = pages.indexOf(page);
-  const otherLang = lang === 'bg' ? 'en' : 'bg';
-  const nav = t.nav.map((n, j) => `<a href="${pathFor(lang, pages[j])}"${i === j ? ' aria-current="page"' : ''}>${n}</a>`).join('');
-  const strings = JSON.stringify(Object.fromEntries(['send', 'sending', 'success', 'error', 'unavailable', 'invalid', 'rate', 'menu', 'close'].map(k => [k, t[k]]))).replace(/</g, '\\u003c');
-  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${t.titles[i]} | Velnovara Group</title><meta name="description" content="${escape(t.descriptions[i])}"><meta name="theme-color" content="#f7f7f4"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/styles.css?v=3"><link rel="alternate" hreflang="bg" href="${pathFor('bg', page)}"><link rel="alternate" hreflang="en" href="${pathFor('en', page)}"><link rel="alternate" hreflang="x-default" href="${pathFor('bg', page)}"><meta property="og:title" content="${t.titles[i]} | Velnovara Group"><meta property="og:description" content="${escape(t.descriptions[i])}"><meta property="og:type" content="website"><script type="application/json" id="ui-strings">${strings}</script><script src="/app.js" defer></script></head><body><a class="skip-link" href="#main">${t.skip}</a><header class="site-header"><div class="wrap header-inner">${brand(lang)}<button class="menu-toggle" aria-expanded="false" aria-controls="main-nav">${t.menu}<span aria-hidden="true"><i></i><i></i></span></button><nav id="main-nav" class="main-nav" aria-label="${t.menu}">${nav}<div class="language-switch"><span aria-current="true">${lang.toUpperCase()}</span><a href="${pathFor(otherLang, page)}" lang="${otherLang}" hreflang="${otherLang}" aria-label="${otherLang === 'en' ? 'Switch to English' : 'Превключи на български'}">${otherLang.toUpperCase()}</a></div></nav></div></header><main id="main" class="page-${page || 'home'}">${page === '' ? home(t, lang) : page === 'services' ? services(t, lang) : page === 'about' ? about(t, lang) : contact(t)}</main><footer class="site-footer"><div class="wrap footer-top"><div>${brand(lang, true)}<p>${t.footerText}</p></div><nav aria-label="${t.menu}">${nav}</nav><div class="footer-contact"><a href="mailto:velnovaragroup@gmail.com">velnovaragroup@gmail.com</a><span>${t.location}</span></div></div><div class="wrap footer-bottom"><span>© ${new Date().getUTCFullYear()} Velnovara Group. ${t.rights}</span><a href="https://commons.wikimedia.org/wiki/File:Cathedral_Saint_Alexander_Nevsky_(23997168458).jpg" target="_blank" rel="noopener noreferrer">${t.credits}</a></div></footer></body></html>`;
+  const other = lang === 'bg' ? 'en' : 'bg';
+  return `<header class="site-header"><div class="wrap header-inner">${brand(lang)}<button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav"><span class="menu-label">${t.menu}</span><span class="menu-icon" aria-hidden="true"><i></i><i></i></span></button><nav id="main-nav" class="main-nav" aria-label="${t.navLabel}">${navLinks(lang, true)}<div class="language-switch"><span aria-current="true">${lang.toUpperCase()}</span><a href="${pathFor(other, page)}" lang="${other}" hreflang="${other}" aria-label="${content[other].languageName}">${other.toUpperCase()}</a></div></nav></div></header>`;
+};
+
+const footer = lang => {
+  const t = content[lang];
+  const f = t.footer;
+  // One row (logo · menu · legal links), then a short privacy note and one quiet legal line:
+  // © company · ЕИК · city. The full address is in the privacy policy.
+  const info = [
+    `© ${year} ${company.legalName[lang] || 'Velnovara Group'}`,
+    company.eik && `${f.eik} ${company.eik}`,
+    company.vat && `${f.vat} ${company.vat}`,
+    `${company.postal.city[lang]}, ${company.postal.country[lang]}`
+  ].filter(Boolean);
+  return `<footer class="site-footer"><div class="wrap footer-row">${brand(lang)}<nav class="footer-nav" aria-label="${t.footerNavLabel}">${navLinks(lang)}</nav><nav class="legal-links" aria-label="${t.legalNavLabel}">${legalPages.map((p, i) => `<a href="${pathFor(lang, p)}">${t.legal[i]}</a>`).join('')}</nav></div><div class="wrap footer-bottom"><p class="footer-privacy">${f.privacy.replace('{email}', `<a href="mailto:${company.contactEmail}">${company.contactEmail}</a>`)}</p><p class="footer-info">${info.map(item => `<span>${item}</span>`).join('<span class="sep" aria-hidden="true">·</span>')}</p></div></footer>`;
+};
+
+const hero = t => `<section class="hero" id="top"><div class="wrap hero-inner"><div class="hero-copy"><p class="eyebrow">${t.hero.eyebrow}</p><h1>${t.hero.title[0]} <span>${t.hero.title[1]}</span></h1><p class="lead">${t.hero.lead}</p><div class="actions"><a class="button" href="#services">${t.hero.primary}<span aria-hidden="true">→</span></a><a class="button button-secondary" href="#contact">${t.hero.secondary}</a></div></div><ul class="workflow" aria-label="${t.hero.cardsLabel}">${t.hero.cards.map(([label, text], i) => `<li class="workflow-card"><span class="workflow-icon">${svg(serviceIcons[i])}</span><strong>${label}</strong><span class="workflow-text">${text}</span></li>`).join('')}</ul></div></section>`;
+
+const services = t => {
+  const s = t.services;
+  // Tabs: app.js shows one service at a time. Without JavaScript the links still work through :target.
+  const index = `<div class="service-tabs" aria-label="${s.indexLabel}">${s.items.map((item, i) => `<a class="service-tab" href="#${item.id}" id="tab-${item.id}"><span class="service-tab-icon">${svg(serviceIcons[i])}</span><span>${item.title}</span></a>`).join('')}</div>`;
+  const list = s.items.map((item, i) => `<article class="service" id="${item.id}"><div class="service-head"><span class="icon-badge">${svg(serviceIcons[i])}</span><div><h3>${item.title}</h3><p class="service-pitch">${item.pitch}</p></div></div><p class="service-body">${item.body}</p><ul class="feature-list">${item.features.map(x => `<li>${x}</li>`).join('')}</ul><div class="service-example"><span class="example-label">${s.exampleLabel}</span><p>${item.example}</p></div></article>`).join('');
+  return `<section class="section services" id="services"><div class="wrap"><header class="section-head"><p class="eyebrow">${s.label}</p><h2>${s.title}</h2><p class="section-intro">${s.intro}</p></header><div class="services-layout">${index}<div class="service-panels">${list}</div></div></div></section>`;
+};
+
+
+const about = t => {
+  const a = t.about;
+  return `<section class="section about" id="about"><div class="wrap about-grid"><div class="about-copy"><p class="eyebrow">${a.label}</p><h2>${a.title}</h2>${a.body.map(p => `<p>${p}</p>`).join('')}</div><figure class="about-photo"><img src="/assets/sofia-wide.webp" width="1200" height="800" alt="${escape(a.photoAlt)}" loading="lazy" decoding="async"></figure></div><div class="wrap products"><h3 class="products-title">${a.productsTitle}</h3><div class="products-grid">${a.products.map(p => {
+    const meta = productMeta[p.name];
+    const host = new URL(meta.url).host;
+    return `<a class="product product-${meta.slug}" href="${meta.url}" target="_blank" rel="noopener"><span class="product-logo"><img src="${meta.logo}" width="64" height="64" alt=""></span><span class="product-text"><strong class="product-name">${p.name}</strong><span class="product-tagline">${p.tagline}</span></span><span class="product-body">${p.body}</span><span class="product-link">${host} <span aria-hidden="true">↗</span></span></a>`;
+  }).join('')}</div></div></section>`;
+};
+
+const contactSection = (t, lang) => {
+  const c = t.contact;
+  return `<section class="section contact" id="contact"><div class="wrap contact-grid"><div class="contact-copy"><p class="eyebrow">${c.label}</p><h2>${c.title}</h2><p class="lead">${c.lead}</p><h3 class="hints-title">${c.hintsTitle}</h3><ul class="contact-hints">${c.hints.map(x => `<li>${x}</li>`).join('')}</ul>${company.contactEmail ? `<p class="email-note">${c.emailNote.replace('{email}', `<a href="mailto:${company.contactEmail}">${company.contactEmail}</a>`)}</p>` : ''}</div><form id="contact-form" class="contact-form" novalidate><h3>${c.formTitle}</h3><div class="form-row"><div class="form-field"><label for="name">${c.name}</label><input id="name" name="name" autocomplete="name" minlength="2" maxlength="100" required placeholder="${escape(c.namePlaceholder)}"></div><div class="form-field"><label for="email">${c.email}</label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" required placeholder="${escape(c.emailPlaceholder)}"></div></div><div class="form-field"><label for="message">${c.message}</label><textarea id="message" name="message" minlength="10" maxlength="5000" rows="4" required placeholder="${escape(c.messagePlaceholder)}"></textarea></div><div class="honeypot" aria-hidden="true"><label for="website">Website</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div><button class="button" type="submit">${t.form.send}<span aria-hidden="true">→</span></button><p class="privacy-note">${c.privacyNote} <a href="${pathFor(lang, 'privacy')}">${t.legal[0]}</a></p><p class="form-status" id="form-status" role="status" aria-live="polite"></p><noscript><p class="form-status">${t.form.unavailable}</p></noscript></form></div></section>`;
+};
+
+const structuredData = lang => JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Velnovara Group',
+  ...(company.legalName[lang] && { legalName: company.legalName[lang] }),
+  ...(company.eik && { taxID: company.eik }),
+  url: site + base(lang),
+  logo: `${site}/apple-touch-icon.png`,
+  slogan: content[lang].slogan,
+  description: content[lang].meta.description,
+  address: { '@type': 'PostalAddress', streetAddress: company.postal.street[lang], postalCode: company.postal.code, addressLocality: company.postal.city[lang], addressCountry: 'BG' },
+  ...(company.contactEmail && { email: company.contactEmail }),
+  ...(company.contactPhone && { telephone: company.contactPhone })
+}).replace(/</g, '\\u003c');
+
+export function render(lang, page = '') {
+  const t = content[lang];
+  const legalIndex = legalPages.indexOf(page);
+  const title = legalIndex < 0 ? t.meta.title : `${t.legal[legalIndex]} | Velnovara Group`;
+  const description = legalIndex < 0 ? t.meta.description : `${t.legal[legalIndex]} — Velnovara Group.`;
+  const url = site + pathFor(lang, page);
+  const strings = JSON.stringify({ ...t.form, menu: t.menu, close: t.close }).replace(/</g, '\\u003c');
+  const font = lang === 'bg' ? 'manrope-cyrillic' : 'manrope-latin';
+  const main = legalIndex < 0
+    ? hero(t) + services(t) + about(t) + contactSection(t, lang)
+    : legalPage(lang, page, t.legal[legalIndex]);
+  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${title}</title><meta name="description" content="${escape(description)}"><link rel="canonical" href="${url}"><link rel="alternate" hreflang="bg" href="${site + pathFor('bg', page)}"><link rel="alternate" hreflang="en" href="${site + pathFor('en', page)}"><link rel="alternate" hreflang="x-default" href="${site + pathFor('bg', page)}"><meta name="theme-color" content="#ffffff"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="preload" href="/assets/fonts/${font}-wght-normal.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="/styles.css?v=${version}"><meta property="og:type" content="website"><meta property="og:site_name" content="Velnovara Group"><meta property="og:locale" content="${lang === 'bg' ? 'bg_BG' : 'en_GB'}"><meta property="og:title" content="${escape(title)}"><meta property="og:description" content="${escape(description)}"><meta property="og:url" content="${url}"><meta property="og:image" content="${site}/assets/og-image.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">${legalIndex < 0 ? `<script type="application/ld+json">${structuredData(lang)}</script>` : ''}<script type="application/json" id="ui-strings">${strings}</script><script src="/app.js?v=${version}" defer></script></head><body class="page-${page || 'home'}"><a class="skip-link" href="#main">${t.skip}</a>${header(lang, page)}<main id="main">${main}</main>${footer(lang)}</body></html>`;
 }
 
-await mkdir(`${root}dist`, { recursive: true });
+const notFound = () => `<!doctype html><html lang="bg"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>404 | Velnovara Group</title><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/styles.css?v=${version}"></head><body class="page-error"><main class="wrap error-page">${brand('bg')}<div class="error-content"><p class="error-number" aria-hidden="true">404</p><h1>Тази страница не е намерена.</h1><p>Проверете адреса или се върнете към началната страница.</p><p lang="en">We couldn’t find this page. Check the address or return to the homepage.</p><div class="actions"><a class="button" href="/">Към началото<span aria-hidden="true">→</span></a><a class="button button-secondary" href="/en/" lang="en">Home in English</a></div></div></main></body></html>`;
+
+const sitemap = () => {
+  const urls = ['bg', 'en'].flatMap(lang => ['', ...legalPages].map(page => `<url><loc>${site + pathFor(lang, page)}</loc><xhtml:link rel="alternate" hreflang="bg" href="${site + pathFor('bg', page)}"/><xhtml:link rel="alternate" hreflang="en" href="${site + pathFor('en', page)}"/></url>`));
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">${urls.join('')}</urlset>\n`;
+};
+
+await rm(`${root}dist`, { recursive: true, force: true });
 await cp(`${root}public`, `${root}dist`, { recursive: true, filter: src => !src.endsWith('sofia-original.jpg') });
 for (const lang of ['bg', 'en']) {
-  for (const page of pages) {
+  for (const page of ['', ...legalPages]) {
     const folder = `${root}dist${pathFor(lang, page)}`;
     await mkdir(folder, { recursive: true });
     await writeFile(`${folder}index.html`, render(lang, page));
   }
 }
-await writeFile(`${root}dist/404.html`, '<!doctype html><html lang="bg"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>404 | Velnovara Group</title><link rel="stylesheet" href="/styles.css?v=3"><main class="page-intro wrap"><span class="eyebrow">404</span><h1>Страницата не е намерена.<br>Page not found.</h1><a class="button" href="/">Начало / Home</a></main></html>');
-await writeFile(`${root}dist/robots.txt`, 'User-agent: *\nAllow: /\n');
-console.log('Built 8 complete pages: Bulgarian default + English.');
+await writeFile(`${root}dist/404.html`, notFound());
+await writeFile(`${root}dist/sitemap.xml`, sitemap());
+await writeFile(`${root}dist/robots.txt`, `User-agent: *\nAllow: /\n\nSitemap: ${site}/sitemap.xml\n`);
+console.log('Built the one-page site (Bulgarian + English) and legal pages.');

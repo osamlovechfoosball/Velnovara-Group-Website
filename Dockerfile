@@ -3,7 +3,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev
 COPY . .
-RUN npm run build
+# The live address goes into canonical links, language alternates and the sitemap.
+ARG SITE_URL=https://velnovaragroup.eu
+RUN SITE_URL=$SITE_URL npm run build
 ENV NODE_ENV=production HOST=0.0.0.0 PORT=3000
 USER node
 EXPOSE 3000
