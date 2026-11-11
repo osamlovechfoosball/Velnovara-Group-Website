@@ -118,7 +118,7 @@ const path = require('node:path');
   assert.ok((await page.locator('#form-status').textContent()).includes('не беше изпратено'));
   assert.equal(await page.locator('#name').inputValue(), 'Иван Петров');
 
-  assert.deepEqual(errors, []);
+  assert.deepEqual(errors, [], `Browser console errors: ${errors.join(' | ')}`);
   await browser.close();
   console.log('PASS: 6 routes × 5 widths, links and fragments, forwarding pages, mobile menu, language switch, service tabs, form states.');
 })().catch(e => {
