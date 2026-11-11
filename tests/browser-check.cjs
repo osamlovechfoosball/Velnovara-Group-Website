@@ -121,4 +121,9 @@ const path = require('node:path');
   assert.deepEqual(errors, []);
   await browser.close();
   console.log('PASS: 6 routes × 5 widths, links and fragments, forwarding pages, mobile menu, language switch, service tabs, form states.');
-})().catch(e => { console.error(e); process.exit(1); });
+})().catch(e => {
+  console.error(e);
+  // On GitHub, also show the reason on the run's summary page.
+  if (process.env.GITHUB_ACTIONS) console.log(`::error title=Browser check failed::${String(e && e.message || e).replace(/s+/g, ' ').slice(0, 900)}`);
+  process.exit(1);
+});
