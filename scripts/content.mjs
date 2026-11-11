@@ -15,7 +15,7 @@ export const company = {
   // Web3Forms access key for the contact form on GitHub Pages. It is meant to be public
   // (it only lets the form deliver to the inbox registered at web3forms.com).
   // Empty = the form posts to the Node server instead (npm start / Docker).
-  formKey: ''
+  formKey: '00935146-dedd-4ffe-bcf2-4ccaf908e2fd'
 };
 
 export const content = {
