@@ -124,6 +124,6 @@ const path = require('node:path');
 })().catch(e => {
   console.error(e);
   // On GitHub, also show the reason on the run's summary page.
-  if (process.env.GITHUB_ACTIONS) console.log(`::error title=Browser check failed::${String(e && e.message || e).replace(/s+/g, ' ').slice(0, 900)}`);
+  if (process.env.GITHUB_ACTIONS) console.log(`::error title=Browser check failed::${String(e && e.message || e).replace(/\s+/g, ' ').slice(0, 900)}`);
   process.exit(1);
 });
