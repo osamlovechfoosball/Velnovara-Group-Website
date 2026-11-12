@@ -86,7 +86,7 @@ svg{display:block;width:28px;height:28px}
 .main-nav{grid-column:2/4;display:grid;grid-template-columns:subgrid;align-items:center;font-size:15px;font-weight:600}
 .nav-links{display:flex;align-items:center;gap:6px}
 /* Menu: rolling text — the word rolls up and a gold copy rolls in from below. */
-.nav-links>a:not(.button){position:relative;display:flex;align-items:center;min-height:44px;padding:0 14px;transition:transform .15s var(--ease)}
+.nav-links>a:not(.button){position:relative;display:flex;align-items:center;min-height:44px;padding:0 23px;transition:transform .15s var(--ease)}
 .nav-links>a:not(.button):active{transform:translateY(1px)}
 .roll{display:block;overflow:hidden;height:1.45em;line-height:1.45em}
 .roll>span,.roll:after{display:block;transition:transform .45s var(--ease)}
