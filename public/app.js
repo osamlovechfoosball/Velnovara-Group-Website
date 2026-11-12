@@ -24,14 +24,14 @@ nav.addEventListener('click', event => { if (event.target.closest('a')) setMenu(
 // text lengths, so the position is saved as "how far into which section" and restored
 // instantly on the other page, without the smooth-scroll animation.
 const scrollKey = 'velnovara-language-scroll';
-const languageLink = document.querySelector('.language-switch a');
-languageLink?.addEventListener('click', () => {
+// The language link sits in the menu and, on phones and tablets, next to the menu button.
+document.querySelectorAll('.language-switch a, .lang-quick').forEach(link => link.addEventListener('click', () => {
   const line = window.scrollY + window.innerHeight * 0.3;
   const section = [...document.querySelectorAll('#top, #services, #about, #contact')].filter(s => s.offsetTop <= line).pop();
   if (!section) return;
   const place = { id: section.id, ratio: (window.scrollY - section.offsetTop) / section.offsetHeight };
   try { sessionStorage.setItem(scrollKey, JSON.stringify(place)); } catch {}
-});
+}));
 let savedPlace = null;
 try { savedPlace = JSON.parse(sessionStorage.getItem(scrollKey)); sessionStorage.removeItem(scrollKey); } catch {}
 if (savedPlace && 'scrollRestoration' in history) history.scrollRestoration = 'manual';
@@ -144,6 +144,17 @@ if (form) {
     button.disabled = false;
     button.replaceChildren(...buttonContent.map(node => node.cloneNode(true)));
   });
+}
+
+// Phones: the bottom bar steps aside while the contact section is on screen (so it never covers
+// the form or the keyboard) and while the menu is open.
+const mobileBar = document.querySelector('.mobile-bar');
+const contactSection = document.querySelector('#contact');
+if (mobileBar && contactSection && 'IntersectionObserver' in window) {
+  let contactInView = false;
+  const updateBar = () => mobileBar.classList.toggle('is-hidden', contactInView || document.body.classList.contains('menu-open'));
+  new IntersectionObserver(([entry]) => { contactInView = entry.isIntersecting; updateBar(); }, { rootMargin: '0px 0px -25% 0px' }).observe(contactSection);
+  new MutationObserver(updateBar).observe(document.body, { attributes: true, attributeFilter: ['class'] });
 }
 
 // Restore the language-switch position last, once the service tabs have hidden their other

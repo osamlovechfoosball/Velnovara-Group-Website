@@ -1,6 +1,6 @@
 # Velnovara Group website
 
-A bilingual one-page website for Velnovara Group. Bulgarian is the default at `/`; English is at `/en/`. The menu scrolls to each section of the page (Home, Services, About, Contact) and highlights the section in view. The design uses white and ivory surfaces, Manrope type (self-hosted, Cyrillic and Latin), black and restrained gold, and a dark contact section. The approved logo and Sofia photograph are retained.
+A bilingual one-page website for Velnovara Group. Bulgarian is the default at `/`; English is at `/en/`. The menu scrolls to each section of the page (Home, Services, About, Contact) and highlights the section in view. The design uses white and ivory surfaces, Manrope type (self-hosted, Cyrillic and Latin), black and restrained gold, and a dark contact section. The approved logo and Sofia photograph are retained. On phones (700px and narrower) the home page has its own layout: the Sofia photo behind the title, two shortcut cards (Services, Products) and a bar fixed to the bottom of the screen (Services · Products · Contact) that steps aside while the contact form is on screen. Desktop and tablet layouts are unchanged.
 
 ## Open in VS Code
 
