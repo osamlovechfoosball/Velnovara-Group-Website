@@ -20,7 +20,7 @@ export const company = {
 export const content = {
   bg: {
     nav: ['Начало', 'Услуги', 'За нас', 'Контакти'],
-    // Phone layout: shortcut cards under the hero and the bottom bar.
+    // Phone layout: shortcut cards under the hero.
     mobile: { products: 'Продукти', shortcuts: 'Бързи връзки' },
     navLabel: 'Основна навигация',
     footerNavLabel: 'Навигация в долната част',

@@ -146,17 +146,6 @@ if (form) {
   });
 }
 
-// Phones: the bottom bar steps aside while the contact section is on screen (so it never covers
-// the form or the keyboard) and while the menu is open.
-const mobileBar = document.querySelector('.mobile-bar');
-const contactSection = document.querySelector('#contact');
-if (mobileBar && contactSection && 'IntersectionObserver' in window) {
-  let contactInView = false;
-  const updateBar = () => mobileBar.classList.toggle('is-hidden', contactInView || document.body.classList.contains('menu-open'));
-  new IntersectionObserver(([entry]) => { contactInView = entry.isIntersecting; updateBar(); }, { rootMargin: '0px 0px -25% 0px' }).observe(contactSection);
-  new MutationObserver(updateBar).observe(document.body, { attributes: true, attributeFilter: ['class'] });
-}
-
 // Restore the language-switch position last, once the service tabs have hidden their other
 // panels and the page has its final height. Fonts and images can still shift it slightly
 // while loading, so settle on the same spot again when everything has loaded.

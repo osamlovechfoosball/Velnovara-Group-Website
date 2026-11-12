@@ -77,8 +77,9 @@ const path = require('node:path');
   await page.waitForTimeout(800);
   const aboutBefore = await page.locator('#about').evaluate(el => el.getBoundingClientRect().top);
   // dispatchEvent: Playwright's click() first scrolls the sticky header "into view", which moves the page.
-  await page.locator('.menu-toggle').dispatchEvent('click');
-  await page.locator('.language-switch a').dispatchEvent('click');
+  await page.locator('.lang-quick').dispatchEvent('click');
+  // Phones have one language switch: the link next to the menu button, not a second one inside the menu.
+  assert.ok(!(await page.locator('.main-nav .language-switch').isVisible()));
   await page.waitForURL(url => url.pathname === '/en/');
   await page.waitForLoadState('load');
   // The visitor stays on the same section after switching language.
