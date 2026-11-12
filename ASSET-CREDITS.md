@@ -21,3 +21,7 @@ Manrope by Mikhail Sharanda, SIL Open Font License 1.1 (`public/assets/fonts/OFL
 ## Syne (logo wordmark)
 
 `public/assets/fonts/syne-latin-700.woff2` is Syne Bold (basic Latin) by Bonjour Monde, from Google Fonts, licensed under the SIL Open Font License 1.1 (same licence text as `public/assets/fonts/OFL.txt`). It is used only for the ELNOVARA wordmark.
+
+## Marcellus (logo GROUP line)
+
+`public/assets/fonts/marcellus-latin-400.woff2` is Marcellus Regular (basic Latin) by Astigmatic, from Google Fonts, licensed under the SIL Open Font License 1.1 (same licence text as `public/assets/fonts/OFL.txt`). It is used only for the word GROUP in the logo.
