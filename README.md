@@ -89,7 +89,7 @@ Open the folder in GitHub Desktop and choose **Publish repository**, named `veln
 
 The typeface is [Manrope](https://github.com/sharanda/manrope), licensed under the SIL Open Font License (`public/assets/fonts/OFL.txt`).
 
-The photo is [Cathedral Saint Alexander Nevsky](https://commons.wikimedia.org/wiki/File:Cathedral_Saint_Alexander_Nevsky_(23997168458).jpg), by **Deensel**, licensed under [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/). It is cropped, resized, and served as AVIF with a WebP fallback in two widths; visible attribution is included at the end of the privacy policy. See `ASSET-CREDITS.md`.
+The evening photo of Sofia was supplied by the owner (source in `brand/sofia-evening-source.webp`). It is cropped to 3:2 and served as AVIF with a WebP fallback in two widths. See `ASSET-CREDITS.md`.
 
 The Velnovara logo was supplied and approved by the owner. The SVG is a faithful geometric recreation for web use; the original PNG remains in the repository for reference.
 
