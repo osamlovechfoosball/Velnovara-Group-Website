@@ -38,7 +38,7 @@ if (savedPlace && 'scrollRestoration' in history) history.scrollRestoration = 'm
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-const menuLinks = [...nav.querySelectorAll(':scope > a[data-section]')];
+const menuLinks = [...nav.querySelectorAll('a[data-section]')];
 
 // Mark the menu item for the section in view.
 if ('IntersectionObserver' in window) {

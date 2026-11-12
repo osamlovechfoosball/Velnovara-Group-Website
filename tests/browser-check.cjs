@@ -26,7 +26,7 @@ const path = require('node:path');
       await page.waitForFunction(() => [...document.images].every(img => img.complete && img.naturalWidth > 0));
       assert.equal(await page.locator('h1').count(), 1, `One H1: ${route}`);
       assert.equal(await page.locator('html').getAttribute('lang'), route.startsWith('/en') ? 'en' : 'bg');
-      assert.equal(await page.locator('.main-nav>a[data-section]').count(), 4);
+      assert.equal(await page.locator('.main-nav a[data-section]').count(), 4);
       const result = await page.evaluate(() => {
         const ids = [...document.querySelectorAll('[id]')].map(e => e.id);
         return {
