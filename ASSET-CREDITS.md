@@ -17,3 +17,7 @@ Manrope by Mikhail Sharanda, SIL Open Font License 1.1 (`public/assets/fonts/OFL
 ## Product logos
 
 `public/assets/products/outboundfinder.svg` and `public/assets/products/resido.webp` are the owner's own OutboundFinder and Resido logos (Resido from its logo pack, cropped to a square). They are not covered by the photograph's licence.
+
+## Syne (logo wordmark)
+
+`public/assets/fonts/syne-latin-700.woff2` is Syne Bold (basic Latin) by Bonjour Monde, from Google Fonts, licensed under the SIL Open Font License 1.1 (same licence text as `public/assets/fonts/OFL.txt`). It is used only for the ELNOVARA wordmark.

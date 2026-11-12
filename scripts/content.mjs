@@ -36,7 +36,6 @@ export const content = {
     },
 
     hero: {
-      eyebrow: 'Дигитални продукти · Софтуер · Иновации',
       title: ['Дигитални системи', 'и автоматизация.'],
       lead: 'Velnovara Group работи в областта на автоматизацията, AI и разработката на софтуер.',
       primary: 'Области на работа',
@@ -169,7 +168,6 @@ export const content = {
     },
 
     hero: {
-      eyebrow: 'Digital products · Software · Innovation',
       title: ['Digital systems', 'and automation.'],
       lead: 'Velnovara Group works in automation, AI engineering and software development.',
       primary: 'Areas of work',

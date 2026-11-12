@@ -31,8 +31,9 @@ const productMeta = {
   Resido: { logo: '/assets/products/resido.webp', url: 'https://residoco.com', slug: 'resido' }
 };
 
-const brand = lang =>
-  `<a class="brand" href="${base(lang)}#top" aria-label="Velnovara Group — ${content[lang].home}"><span class="brand-type"><span class="brand-name"><img class="brand-v" src="/assets/mark.svg" width="46" height="34" alt="">ELNOVARA</span><span class="brand-group">GROUP</span><span class="brand-slogan">${content[lang].slogan}</span></span></a>`;
+// The header shows the logo without the slogan (the slogan opens the hero instead); the footer keeps it.
+const brand = (lang, withSlogan = true) =>
+  `<a class="brand" href="${base(lang)}#top" aria-label="Velnovara Group — ${content[lang].home}"><span class="brand-type"><span class="brand-name"><img class="brand-v" src="/assets/mark.svg" width="46" height="34" alt="">ELNOVARA</span><span class="brand-group">GROUP</span>${withSlogan ? `<span class="brand-slogan">${content[lang].slogan}</span>` : ''}</span></a>`;
 
 // Header links use the rolling-text effect: the word rolls up and a gold copy rolls in from below.
 const navLinks = (lang, roll = false) =>
@@ -41,7 +42,7 @@ const navLinks = (lang, roll = false) =>
 const header = (lang, page) => {
   const t = content[lang];
   const other = lang === 'bg' ? 'en' : 'bg';
-  return `<header class="site-header"><div class="wrap header-inner">${brand(lang)}<a class="lang-quick" href="${pathFor(other, page)}" lang="${other}" hreflang="${other}" aria-label="${content[other].languageName}">${other.toUpperCase()}</a><button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav"><span class="menu-label">${t.menu}</span><span class="menu-icon" aria-hidden="true"><i></i><i></i></span></button><nav id="main-nav" class="main-nav" aria-label="${t.navLabel}"><div class="nav-links">${navLinks(lang, true)}</div><div class="language-switch"><span aria-current="true">${lang.toUpperCase()}</span><a href="${pathFor(other, page)}" lang="${other}" hreflang="${other}" aria-label="${content[other].languageName}">${other.toUpperCase()}</a></div></nav></div></header>`;
+  return `<header class="site-header"><div class="wrap header-inner">${brand(lang, false)}<a class="lang-quick" href="${pathFor(other, page)}" lang="${other}" hreflang="${other}" aria-label="${content[other].languageName}">${other.toUpperCase()}</a><button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav"><span class="menu-label">${t.menu}</span><span class="menu-icon" aria-hidden="true"><i></i><i></i></span></button><nav id="main-nav" class="main-nav" aria-label="${t.navLabel}"><div class="nav-links">${navLinks(lang, true)}</div><div class="language-switch"><span aria-current="true">${lang.toUpperCase()}</span><a href="${pathFor(other, page)}" lang="${other}" hreflang="${other}" aria-label="${content[other].languageName}">${other.toUpperCase()}</a></div></nav></div></header>`;
 };
 
 const footer = lang => {
@@ -64,7 +65,7 @@ const heroPhoto = `<picture class="hero-photo"><source media="(max-width: 700px)
 
 const shortcut = (href, icon, label) => `<a href="${href}"><span class="shortcut-icon">${svg(icon)}</span><span class="shortcut-label">${label}<span aria-hidden="true">→</span></span></a>`;
 
-const hero = t => `<section class="hero" id="top"><div class="wrap hero-inner"><div class="hero-copy"><div class="hero-title">${heroPhoto}<p class="eyebrow">${t.hero.eyebrow}</p><h1>${t.hero.title[0]} <span>${t.hero.title[1]}</span></h1></div><p class="lead">${t.hero.lead}</p><div class="actions"><a class="button" href="#services">${t.hero.primary}<span aria-hidden="true">→</span></a><a class="button button-secondary" href="#contact">${t.hero.secondary}</a></div><nav class="hero-shortcuts" aria-label="${t.mobile.shortcuts}">${shortcut('#services', serviceIcons[1], t.nav[1])}${shortcut('#products', serviceIcons[2], t.mobile.products)}</nav></div><ul class="workflow" aria-label="${t.hero.cardsLabel}">${t.hero.cards.map(([label, text], i) => `<li class="workflow-card"><span class="workflow-icon">${svg(serviceIcons[i])}</span><strong>${label}</strong><span class="workflow-text">${text}</span></li>`).join('')}</ul></div></section>`;
+const hero = t => `<section class="hero" id="top"><div class="wrap hero-inner"><div class="hero-copy"><div class="hero-title">${heroPhoto}<p class="eyebrow">${t.slogan}</p><h1>${t.hero.title[0]} <span>${t.hero.title[1]}</span></h1></div><p class="lead">${t.hero.lead}</p><div class="actions"><a class="button" href="#services">${t.hero.primary}<span aria-hidden="true">→</span></a><a class="button button-secondary" href="#contact">${t.hero.secondary}</a></div><nav class="hero-shortcuts" aria-label="${t.mobile.shortcuts}">${shortcut('#services', serviceIcons[1], t.nav[1])}${shortcut('#products', serviceIcons[2], t.mobile.products)}</nav></div><ul class="workflow" aria-label="${t.hero.cardsLabel}">${t.hero.cards.map(([label, text], i) => `<li class="workflow-card"><span class="workflow-icon">${svg(serviceIcons[i])}</span><strong>${label}</strong><span class="workflow-text">${text}</span></li>`).join('')}</ul></div></section>`;
 
 const services = t => {
   const s = t.services;
