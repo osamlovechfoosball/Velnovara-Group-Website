@@ -179,6 +179,33 @@ if (!reduceMotion && 'IntersectionObserver' in window) {
 }
 
 const form = document.querySelector('#contact-form');
+
+// Phones: the contact form stays closed behind one button, so the section stays short.
+// Without JavaScript, and on larger screens, the form is always open.
+const contactToggle = document.querySelector('.contact-toggle');
+if (form && contactToggle) {
+  const contact = form.closest('.contact');
+  const phoneScreen = window.matchMedia('(max-width: 700px)');
+  const setOpen = open => {
+    form.classList.toggle('is-open', open);
+    contactToggle.setAttribute('aria-expanded', String(open));
+  };
+  const applyContactLayout = () => {
+    contact.classList.toggle('is-collapsible', phoneScreen.matches);
+    contactToggle.hidden = !phoneScreen.matches;
+  };
+  contactToggle.addEventListener('click', () => {
+    const open = contactToggle.getAttribute('aria-expanded') !== 'true';
+    setOpen(open);
+    if (open) {
+      form.querySelector('input').focus({ preventScroll: true });
+      contactToggle.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    }
+  });
+  applyContactLayout();
+  phoneScreen.addEventListener('change', applyContactLayout);
+}
+
 if (form) {
   const status = document.querySelector('#form-status');
   const button = form.querySelector('button[type="submit"]');

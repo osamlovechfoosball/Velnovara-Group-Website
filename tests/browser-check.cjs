@@ -92,8 +92,16 @@ const path = require('node:path');
   await page.keyboard.press('Escape');
   assert.equal(await page.locator('.menu-toggle').getAttribute('aria-expanded'), 'false');
 
-  // Phones: services are an accordion; tapping a title opens it and closes the others.
+  // Phones: the contact form stays closed behind one button until it is tapped.
   await page.goto(origin + '/');
+  assert.equal(await page.locator('#contact-form').isVisible(), false);
+  await page.locator('.contact-toggle').click();
+  assert.ok(await page.locator('#contact-form').isVisible());
+  assert.equal(await page.locator('.contact-toggle').getAttribute('aria-expanded'), 'true');
+  await page.locator('.contact-toggle').click();
+  assert.equal(await page.locator('#contact-form').isVisible(), false);
+
+  // Phones: services are an accordion; tapping a title opens it and closes the others.
   assert.equal(await page.locator('.service-tabs').isVisible(), false);
   assert.equal(await page.locator('.service.open').count(), 1);
   await page.locator('#ai .service-head').click();
