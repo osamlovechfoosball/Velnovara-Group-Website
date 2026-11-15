@@ -419,6 +419,11 @@ svg{display:block;width:28px;height:28px}
   .contact.is-collapsible .contact-grid{gap:18px}
   .contact-form textarea{min-height:90px}
   .footer-privacy{font-size:12px;line-height:1.5}
+  /* Footer: the logo and the legal links centred; the menu is already in the header. */
+  .footer-row{grid-template-columns:1fr;justify-items:center;gap:6px;padding-block:28px 12px}
+  .footer-row .brand{justify-self:center}
+  .footer-nav{display:none}
+  .legal-links{justify-content:center}
 }
 
 @media (max-width:560px){
@@ -438,9 +443,6 @@ svg{display:block;width:28px;height:28px}
   .hero .actions{gap:13px}
   .hero .eyebrow{font-size:10.5px;letter-spacing:.14em}
   .service-head{flex-direction:column;gap:16px}
-  .footer-row{grid-template-columns:1fr;gap:14px}
-  .footer-nav{grid-row:auto;gap:0 10px}
-  .legal-links{justify-content:flex-start}
   .footer-info{flex-direction:column;align-items:center;gap:4px}
   .footer-info>.sep{display:none}
 }
