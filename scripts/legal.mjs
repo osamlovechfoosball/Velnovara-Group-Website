@@ -2,7 +2,8 @@ import { company } from './content.mjs';
 
 const updated = { bg: 'Последна актуализация: 11 ноември 2026 г.', en: 'Last updated: 11 November 2026' };
 const contactLink = { bg: '<a href="/#contact">формата за контакт</a>', en: '<a href="/en/#contact">contact form</a>' };
-const email = `<a href="mailto:${company.contactEmail}">${company.contactEmail}</a>`;
+// Privacy and data requests go to the support address; info@ is the general contact address.
+const email = `<a href="mailto:${company.supportEmail}">${company.supportEmail}</a>`;
 const phone = `<a href="tel:${company.contactPhone.replace(/\s/g, '')}">${company.contactPhone}</a>`;
 
 const sections = {

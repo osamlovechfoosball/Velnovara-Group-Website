@@ -11,7 +11,7 @@ const path = require('node:path');
   page.on('pageerror', e => errors.push(e.message));
   page.on('console', msg => { if (msg.type() === 'error' && !msg.text().includes('status of 500')) errors.push(msg.text()); });
   const origin = process.env.TEST_ORIGIN || 'http://localhost:3000';
-  const routes = ['/', '/en/', '/privacy/', '/gdpr/', '/en/privacy/', '/en/gdpr/'];
+  const routes = ['/', '/en/', '/de/', '/fr/', '/es/', '/it/', '/privacy/', '/gdpr/', '/en/privacy/', '/en/gdpr/'];
   const folder = path.join(__dirname, '../test-results');
   fs.mkdirSync(folder, { recursive: true });
   const links = new Set();
@@ -25,7 +25,7 @@ const path = require('node:path');
       await page.locator('img').evaluateAll(imgs => imgs.forEach(img => { img.loading = 'eager'; }));
       await page.waitForFunction(() => [...document.images].every(img => img.complete && img.naturalWidth > 0));
       assert.equal(await page.locator('h1').count(), 1, `One H1: ${route}`);
-      assert.equal(await page.locator('html').getAttribute('lang'), route.startsWith('/en') ? 'en' : 'bg');
+      assert.equal(await page.locator('html').getAttribute('lang'), route.match(/^\/(en|de|fr|es|it)\//)?.[1] || 'bg');
       assert.equal(await page.locator('.main-nav a[data-section]').count(), 4);
       const result = await page.evaluate(() => {
         const ids = [...document.querySelectorAll('[id]')].map(e => e.id);
@@ -77,8 +77,11 @@ const path = require('node:path');
   await page.waitForTimeout(800);
   const aboutBefore = await page.locator('#about').evaluate(el => el.getBoundingClientRect().top);
   // dispatchEvent: Playwright's click() first scrolls the sticky header "into view", which moves the page.
-  await page.locator('.lang-quick').dispatchEvent('click');
-  // Phones have one language switch: the link next to the menu button, not a second one inside the menu.
+  // The language menu next to the menu button opens a list of all six languages.
+  await page.locator('.lang-quick summary').dispatchEvent('click');
+  assert.equal(await page.locator('.lang-quick a[data-lang]').count(), 6);
+  await page.locator('.lang-quick a[data-lang="en"]').dispatchEvent('click');
+  // Phones have one language menu: the one next to the menu button, not a second one inside the menu.
   assert.ok(!(await page.locator('.main-nav .language-switch').isVisible()));
   await page.waitForURL(url => url.pathname === '/en/');
   await page.waitForLoadState('load');
@@ -89,11 +92,23 @@ const path = require('node:path');
   await page.keyboard.press('Escape');
   assert.equal(await page.locator('.menu-toggle').getAttribute('aria-expanded'), 'false');
 
-  // Services show one at a time.
+  // Phones: services are an accordion; tapping a title opens it and closes the others.
   await page.goto(origin + '/');
+  assert.equal(await page.locator('.service-tabs').isVisible(), false);
+  assert.equal(await page.locator('.service.open').count(), 1);
+  await page.locator('#ai .service-head').click();
+  assert.equal(await page.locator('.service.open').count(), 1);
+  assert.ok(await page.locator('#ai .feature-list').isVisible());
+  assert.ok(!(await page.locator('#automation .feature-list').isVisible()));
+  await page.locator('#ai .service-head').click();
+  assert.equal(await page.locator('.service.open').count(), 0);
+
+  // Computers: services show one at a time, chosen from the list; no "For example" box anywhere.
+  await page.setViewportSize({ width: 1440, height: 1000 });
   await page.locator('#tab-ai').click();
   assert.equal(await page.locator('.service:not([hidden])').count(), 1);
   assert.ok(await page.locator('#ai').isVisible());
+  assert.equal(await page.locator('.service-example').count(), 0);
 
   // Form states, with Web3Forms mocked so no email is ever sent.
   const web3forms = (status, body) => route => route.request().method() === 'OPTIONS'
@@ -121,7 +136,7 @@ const path = require('node:path');
 
   assert.deepEqual(errors, [], `Browser console errors: ${errors.join(' | ')}`);
   await browser.close();
-  console.log('PASS: 6 routes × 5 widths, links and fragments, forwarding pages, mobile menu, language switch, service tabs, form states.');
+  console.log('PASS: 10 routes × 5 widths, links and fragments, forwarding pages, mobile menu, language switch, service tabs, form states.');
 })().catch(e => {
   console.error(e);
   // On GitHub, also show the reason on the run's summary page.

@@ -20,18 +20,27 @@ document.addEventListener('keydown', event => {
 window.matchMedia('(min-width: 901px)').addEventListener('change', event => { if (event.matches) setMenu(false); });
 nav.addEventListener('click', event => { if (event.target.closest('a')) setMenu(false); });
 
-// Keep the visitor's exact place when switching language. The two languages have different
+// Keep the visitor's exact place when switching language. The languages have different
 // text lengths, so the position is saved as "how far into which section" and restored
 // instantly on the other page, without the smooth-scroll animation.
 const scrollKey = 'velnovara-language-scroll';
-// The language link sits in the menu and, on phones and tablets, next to the menu button.
-document.querySelectorAll('.language-switch a, .lang-quick').forEach(link => link.addEventListener('click', () => {
+// The language menu sits at the right of the menu and, on phones and tablets, next to the menu button.
+// A language chosen here is remembered, so the homepage address opens in it next time (see lang.js).
+document.querySelectorAll('.lang-menu a[data-lang]').forEach(link => link.addEventListener('click', () => {
+  try { localStorage.setItem('velnovara-language', link.dataset.lang); } catch {}
   const line = window.scrollY + window.innerHeight * 0.3;
   const section = [...document.querySelectorAll('#top, #services, #about, #contact')].filter(s => s.offsetTop <= line).pop();
   if (!section) return;
   const place = { id: section.id, ratio: (window.scrollY - section.offsetTop) / section.offsetHeight };
   try { sessionStorage.setItem(scrollKey, JSON.stringify(place)); } catch {}
 }));
+// The language list closes on a click elsewhere or with Escape.
+const langMenus = [...document.querySelectorAll('.lang-menu')];
+document.addEventListener('click', event => langMenus.forEach(m => { if (m.open && !m.contains(event.target)) m.open = false; }));
+document.addEventListener('keydown', event => {
+  if (event.key !== 'Escape') return;
+  langMenus.forEach(m => { if (m.open) { m.open = false; m.querySelector('summary').focus(); } });
+});
 let savedPlace = null;
 try { savedPlace = JSON.parse(sessionStorage.getItem(scrollKey)); sessionStorage.removeItem(scrollKey); } catch {}
 if (savedPlace && 'scrollRestoration' in history) history.scrollRestoration = 'manual';
@@ -61,21 +70,24 @@ const updateHeader = () => header.classList.toggle('is-scrolled', window.scrollY
 window.addEventListener('scroll', updateHeader, { passive: true });
 updateHeader();
 
-// Services: one service visible at a time, chosen from the list (tabs pattern).
+// Services. Computers and tablets: one service visible at a time, chosen from the list (tabs pattern).
+// Phones: all services as an accordion, one open at a time, opened by tapping its title.
 const servicesLayout = document.querySelector('.services-layout');
 if (servicesLayout) {
   const tablist = servicesLayout.querySelector('.service-tabs');
   const tabs = [...tablist.querySelectorAll('.service-tab')];
   const panels = tabs.map(tab => document.getElementById(tab.hash.slice(1)));
+  const heads = panels.map(panel => panel.querySelector('.service-head'));
+  const phone = window.matchMedia('(max-width: 700px)');
+  let current = 0;
   tablist.setAttribute('role', 'tablist');
   tabs.forEach((tab, i) => {
     tab.setAttribute('role', 'tab');
     tab.setAttribute('aria-controls', panels[i].id);
-    panels[i].setAttribute('role', 'tabpanel');
-    panels[i].setAttribute('aria-labelledby', tab.id);
-    panels[i].tabIndex = 0;
   });
   const select = (index, { focus = false, animate = true } = {}) => {
+    current = index;
+    if (phone.matches) return openService(index);
     tabs.forEach((tab, i) => {
       const active = i === index;
       tab.setAttribute('aria-selected', String(active));
@@ -100,7 +112,49 @@ if (servicesLayout) {
     event.preventDefault();
     select((next + tabs.length) % tabs.length, { focus: true });
   });
-  select(Math.max(0, panels.findIndex(panel => `#${panel.id}` === location.hash)), { animate: false });
+  // Phones: the accordion. -1 means every service is closed.
+  const openService = index => {
+    panels.forEach((panel, i) => {
+      panel.hidden = false;
+      panel.classList.toggle('open', i === index);
+      heads[i].setAttribute('aria-expanded', String(i === index));
+    });
+  };
+  heads.forEach((head, i) => {
+    head.addEventListener('click', () => {
+      if (!phone.matches) return;
+      current = current === i ? -1 : i;
+      openService(current);
+    });
+    head.addEventListener('keydown', event => {
+      if (phone.matches && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); head.click(); }
+    });
+  });
+  // Switch between the two patterns when the screen size changes (for example, turning a tablet).
+  const applyLayout = () => {
+    const accordion = phone.matches;
+    servicesLayout.classList.toggle('is-accordion', accordion);
+    panels.forEach((panel, i) => {
+      if (accordion) {
+        panel.removeAttribute('role');
+        panel.removeAttribute('aria-labelledby');
+        panel.removeAttribute('tabindex');
+        heads[i].setAttribute('role', 'button');
+        heads[i].tabIndex = 0;
+        heads[i].setAttribute('aria-controls', panel.id);
+      } else {
+        panel.classList.remove('open');
+        panel.setAttribute('role', 'tabpanel');
+        panel.setAttribute('aria-labelledby', tabs[i].id);
+        panel.tabIndex = 0;
+        ['role', 'tabindex', 'aria-expanded', 'aria-controls'].forEach(name => heads[i].removeAttribute(name));
+      }
+    });
+    select(Math.max(current, 0), { animate: false });
+  };
+  current = Math.max(0, panels.findIndex(panel => `#${panel.id}` === location.hash));
+  applyLayout();
+  phone.addEventListener('change', applyLayout);
   servicesLayout.classList.add('tabs-ready');
 }
 

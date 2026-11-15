@@ -25,7 +25,7 @@
 html{scroll-behavior:smooth;scroll-padding-top:calc(var(--header) + 16px);-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-feature-settings:'locl' 0}
 h1,h2,h3,h4,p,figure,ol,ul,dl,dd{margin:0}
-h1,h2,h3,h4{font-weight:700;line-height:1.12;letter-spacing:-.03em;text-wrap:balance}
+h1,h2,h3,h4{font-weight:700;line-height:1.12;letter-spacing:-.03em;text-wrap:balance;overflow-wrap:break-word;hyphens:auto}
 h1{font-size:clamp(2.5rem,5.2vw,4.4rem);font-weight:800;letter-spacing:-.04em;line-height:1.04}
 h2{font-size:clamp(2rem,3.4vw,3rem)}
 h3{font-size:1.35rem}
@@ -93,13 +93,22 @@ svg{display:block;width:28px;height:28px}
 .roll:after{content:attr(data-text);color:var(--gold)}
 .nav-links>a:hover .roll>span,.nav-links>a:hover .roll:after,.nav-links>a:focus-visible .roll>span,.nav-links>a:focus-visible .roll:after{transform:translateY(-100%)}
 .nav-links>a[aria-current] .roll>span{color:var(--gold-dark)}
-.language-switch{display:flex;justify-self:end;gap:4px;font-size:13px;font-weight:700}
-.language-switch a,.language-switch span{display:grid;place-items:center;min-width:38px;min-height:38px;border-radius:999px;transition:background .25s,color .25s}
-.language-switch span{color:var(--gold);background:var(--gold-tint)}
-.language-switch a{color:var(--muted)}
-.language-switch a:hover{color:var(--ink);background:var(--soft)}
+.language-switch{display:flex;justify-self:end}
+/* Language menu: the current code with a small arrow; the list of languages drops down below it. */
+.lang-menu{position:relative}
+.lang-menu summary{display:flex;align-items:center;gap:8px;min-height:38px;padding:0 14px;border-radius:999px;background:var(--gold-tint);color:var(--gold);font-size:13px;font-weight:700;letter-spacing:.04em;list-style:none;cursor:pointer;user-select:none;transition:background .25s,color .25s}
+.lang-menu summary::-webkit-details-marker{display:none}
+.lang-menu summary:after{content:'';width:6px;height:6px;margin-top:-3px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg);transition:transform .25s var(--ease),margin .25s}
+.lang-menu[open] summary:after{margin-top:3px;transform:rotate(-135deg)}
+.lang-menu summary:hover{background:#efe3cb}
+.lang-menu ul{position:absolute;right:0;top:calc(100% + 8px);z-index:40;min-width:190px;margin:0;padding:6px;list-style:none;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 18px 40px #5349362e;animation:rise .25s var(--ease)}
+.lang-menu a{display:flex;align-items:center;justify-content:space-between;gap:18px;min-height:42px;padding:0 12px;border-radius:8px;font-size:14.5px;font-weight:600;color:var(--ink);transition:background .2s}
+.lang-menu a small{font-size:11.5px;font-weight:700;letter-spacing:.06em;color:var(--muted)}
+.lang-menu a:hover{background:var(--soft)}
+.lang-menu a[aria-current]{background:var(--gold-tint);color:var(--gold-dark)}
+.lang-menu a[aria-current] small{color:var(--gold)}
 .menu-toggle{display:none}
-.lang-quick,.hero-photo,.hero-shortcuts{display:none}
+.lang-quick,.hero-photo{display:none}
 
 /* Hero */
 .hero{position:relative;overflow:hidden;background:var(--paper)}
@@ -150,7 +159,7 @@ svg{display:block;width:28px;height:28px}
 .service-tab-icon svg{width:21px;height:21px}
 .service-tab:hover .service-tab-icon{transform:rotate(-8deg) scale(1.06)}
 .service-tab[aria-selected=true] .service-tab-icon{background:var(--gold);color:#fff;transform:none}
-.service{padding:clamp(26px,3.5vw,44px);background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 24px 60px #53493612}
+.service{--pad:clamp(26px,3.5vw,44px);padding:var(--pad) var(--pad) 0;overflow:hidden;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 24px 60px #53493612}
 .service[hidden]{display:none}
 /* Without JavaScript the tab links still switch services through :target. */
 .services-layout:not(.tabs-ready) .service:not(:first-child),.services-layout:not(.tabs-ready) .service-panels:has(.service:target) .service:first-child:not(:target){display:none}
@@ -165,13 +174,11 @@ svg{display:block;width:28px;height:28px}
 .service-head h3{font-size:clamp(1.5rem,2.3vw,1.9rem)}
 .service-pitch{margin-top:8px;font-size:18px;font-weight:600;color:var(--ink)}
 .service-body{margin-top:16px;font-size:16.5px;max-width:640px}
-/* Plain checklist: these are facts, not buttons. */
-/* What the service covers: quiet text chips, no repeated icons. */
-.feature-list{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin-top:20px}
-.feature-list li{padding:7px 14px;border:1px solid var(--line);border-radius:999px;background:var(--soft);font-size:14px;font-weight:500;color:var(--ink)}
-.service-example{margin-top:24px;padding:20px 24px;background:var(--soft);border-left:3px solid var(--gold-light);border-radius:0 var(--radius) var(--radius) 0}
-.example-label{display:block;margin-bottom:6px;color:var(--gold);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
-.service-example p{font-size:15.5px;color:var(--ink)}
+/* What the service covers: a strip along the bottom of the card, one column per item. */
+.feature-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));list-style:none;padding:0;margin:34px calc(var(--pad) * -1) 0;border-top:1px solid var(--line);background:var(--soft)}
+.feature-list li{padding:20px 22px 22px;font-size:15px;font-weight:600;line-height:1.4;color:var(--ink)}
+.feature-list li:first-child{padding-left:var(--pad)}
+.feature-list li+li{border-left:1px solid var(--line)}
 
 /* About */
 .about{background:var(--soft);border-top:1px solid var(--line)}
@@ -284,8 +291,10 @@ svg{display:block;width:28px;height:28px}
   :root{--header:70px}
   .header-inner{display:flex;justify-content:space-between}
   .wrap{width:min(var(--max),100% - 40px)}
-  .lang-quick{display:grid;place-items:center;min-width:44px;min-height:44px;margin-left:auto;margin-right:8px;font-size:15px;font-weight:800;letter-spacing:.04em;color:var(--gold)}
-  .lang-quick:hover{color:var(--gold-dark)}
+  .lang-quick{display:block;margin-left:auto;margin-right:6px}
+  .lang-quick summary{min-height:44px;padding:0 10px;background:none;font-size:15px;font-weight:800}
+  .lang-quick summary:hover{background:none;color:var(--gold-dark)}
+  .lang-quick ul{right:-48px}
   .menu-toggle{display:flex;align-items:center;gap:12px;min-height:44px;padding:0 2px;background:none;border:0;font-size:15px;font-weight:700}
   .menu-icon{display:flex;flex-direction:column;gap:6px}
   .menu-icon i{display:block;width:22px;height:2px;background:var(--ink);transition:transform .2s}
@@ -310,7 +319,7 @@ svg{display:block;width:28px;height:28px}
   .hero:before{background:linear-gradient(180deg,#fff 0%,#fff 55%,rgba(255,255,255,.6) 80%,rgba(255,255,255,.3) 100%),url(/assets/workflow-desk.webp) 78% bottom/auto 60% no-repeat}
   .hero-inner{min-height:0;padding-block:56px 72px}
 
-  .services-layout{grid-template-columns:1fr;gap:20px}
+  .services-layout{grid-template-columns:minmax(0,1fr);gap:20px}
   /* Services become a swipeable row of chips above the selected service. */
   .service-tabs{position:relative;top:auto;display:flex;gap:8px;margin-inline:-20px;padding:4px 20px 14px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none}
   .service-tabs::-webkit-scrollbar{display:none}
@@ -321,40 +330,83 @@ svg{display:block;width:28px;height:28px}
   .service-tab-icon{width:34px;height:34px}
   .service-tab-icon svg{width:18px;height:18px}
 
-  .about-grid,.contact-grid{grid-template-columns:1fr}
+  .about-grid,.contact-grid{grid-template-columns:minmax(0,1fr)}
   .about-photo{max-width:640px}
   .products-grid{grid-template-columns:minmax(0,1fr)}
 }
 
-/* Phones: photo hero and two shortcut cards. Desktop and tablet layouts are unchanged. */
+/* Phones: photo hero, services as an accordion, compact products and contact. */
 @media (max-width:700px){
   .brand-slogan{display:none}
   .hero:before{display:none}
   .hero-inner{padding-block:0 30px;gap:0}
-  .hero-title{position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-height:min(470px,120vw);margin:0 -20px;padding:0 20px 24px;overflow:hidden;background:#1d2433}
+  .hero-title{position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-height:300px;margin:0 -20px;padding:0 20px 24px;overflow:hidden;background:#1d2433}
   .hero-photo,.hero-photo img{display:block;position:absolute;inset:0;width:100%;height:100%}
-  .hero-photo img{object-fit:cover;object-position:center top}
-  /* Sky, Vitosha and the cathedral stay clear; the title sits on a dark fade at the bottom. */
-  .hero-title:after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 0%,transparent 46%,#0b0f1a8c 66%,#0b0f1ae6 100%)}
+  .hero-photo img{object-fit:cover;object-position:70% center}
+  /* The laptop and plant stay visible at the top; the title sits on a dark fade at the bottom. */
+  .hero-title:after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 0%,#0b0f1a40 45%,#0b0f1ad9 100%)}
   .hero-title>.eyebrow,.hero-title>h1{position:relative;z-index:1}
   .hero .hero-title .eyebrow{margin-bottom:12px;color:#e8c98c}
   .hero h1,.hero h1 span{color:#fff;text-shadow:0 2px 18px #0006}
-  .hero .lead{margin-top:22px;font-size:18px;line-height:1.5;color:var(--ink)}
+  .hero .lead{margin-top:16px;font-size:16.5px;line-height:1.5;color:var(--ink)}
   .hero .actions{display:block;margin-top:14px}
   .hero .button{min-height:44px;padding:0 0 2px;gap:10px;border:0;border-bottom:2px solid var(--ink);border-radius:0;background:none;color:var(--ink);font-size:16px;font-weight:700;box-shadow:none}
   .hero .button:after{display:none}
   .hero .button:hover{background:none;color:var(--gold-dark);border-color:var(--gold-dark);transform:none;box-shadow:none}
   .hero .button-secondary{display:none}
   .workflow{display:none}
-  .hero-shortcuts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px}
-  .hero-shortcuts a{display:grid;gap:14px;padding:18px 16px;border:1px solid var(--line);border-radius:12px;background:var(--soft);transition:border-color .25s,background .25s}
-  .hero-shortcuts a:active{border-color:var(--gold-light);background:var(--gold-tint)}
-  .shortcut-icon{color:var(--gold)}
-  .shortcut-icon svg{width:34px;height:34px}
-  .shortcut-label{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:18px;font-weight:800;letter-spacing:-.02em}
-  .shortcut-label span{color:var(--gold)}
-  .about-photo{display:none}
+  .hero-inner{grid-template-columns:minmax(0,1fr)}
 
+  .section{padding-block:48px}
+  .section-head{margin-bottom:24px}
+  .section-intro{margin-top:10px;font-size:15.5px}
+
+  /* Services: an accordion (app.js adds .is-accordion), one service open at a time. */
+  .is-accordion .service-tabs{display:none}
+  .is-accordion .service-panels{display:grid;gap:8px}
+  .is-accordion .service{padding:14px 16px;border-radius:12px;box-shadow:none}
+  .is-accordion .service-head{flex-direction:row;align-items:center;gap:14px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .is-accordion .service-head:focus-visible{outline:2px solid var(--gold);outline-offset:4px;border-radius:8px}
+  .is-accordion .service-head>div{flex:1;min-width:0}
+  .is-accordion .service-head .icon-badge{width:40px;height:40px;flex-shrink:0}
+  .is-accordion .service-head .icon-badge svg{width:20px;height:20px}
+  .is-accordion .service-head h3{font-size:1.05rem}
+  .is-accordion .service-head:after{content:'+';flex-shrink:0;font-size:22px;line-height:1;color:var(--gold)}
+  .is-accordion .service.open .service-head:after{content:'–'}
+  .is-accordion .service-pitch{margin-top:4px;font-size:15px}
+  .is-accordion .service-body,.is-accordion .service:not(.open) .service-pitch,.is-accordion .service:not(.open) .feature-list{display:none}
+  .is-accordion .feature-list{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 2px;border:0;background:none}
+  .is-accordion .feature-list li{padding:5px 11px;border:1px solid var(--line);border-radius:999px;background:var(--soft);font-size:12.5px;font-weight:500}
+
+  /* About: one paragraph and the Sofia photo as a wide picture. */
+  .about-grid{gap:0}
+  .about-copy p{margin-top:12px;font-size:15.5px}
+  .about-copy p+p{display:none}
+  .about-photo{margin-top:20px}
+  .about-photo img{aspect-ratio:16/9;object-fit:cover;border-radius:12px}
+
+  /* Products: one compact row each. */
+  .products{margin-top:36px}
+  .products-title{margin-bottom:12px}
+  .products-grid{gap:10px}
+  .product{grid-template-columns:auto minmax(0,1fr) auto;padding:14px 16px;gap:0 14px}
+  .product-body{display:none}
+  .product-logo{width:44px;height:44px;border-radius:12px}
+  .product-resido .product-logo{padding:6px}
+  .product-name{font-size:1.05rem}
+  .product-tagline{font-size:12.5px}
+  .product-link{grid-column:3;grid-row:1;gap:0;font-size:0}
+  .product-link span{font-size:18px}
+
+  /* Contact: the heading, a short line, the email address and the form. */
+  .contact-copy .lead{margin-top:12px;font-size:15.5px}
+  .hints-title,.contact-hints{display:none}
+  .email-note{margin-top:12px;font-size:14px}
+  .contact-grid{gap:22px}
+  .contact-form{padding:20px}
+  .contact-form h3{display:none}
+  .contact-form textarea{min-height:90px}
+  .footer-privacy{font-size:12px;line-height:1.5}
 }
 
 @media (max-width:560px){
@@ -374,8 +426,6 @@ svg{display:block;width:28px;height:28px}
   .hero .actions{gap:13px}
   .hero .eyebrow{font-size:10.5px;letter-spacing:.14em}
   .service-head{flex-direction:column;gap:16px}
-  .service-example{padding:18px}
-  .product{padding:22px}
   .footer-row{grid-template-columns:1fr;gap:14px}
   .footer-nav{grid-row:auto;gap:0 10px}
   .legal-links{justify-content:flex-start}
@@ -384,9 +434,6 @@ svg{display:block;width:28px;height:28px}
 }
 
 @media (max-width:370px){
-  .product{gap:16px 14px}
-  .product-logo{width:52px;height:52px;border-radius:13px}
-  .product-name{font-size:1.2rem}
   .brand-slogan{display:none}
 }
 

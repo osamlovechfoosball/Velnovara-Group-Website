@@ -51,13 +51,14 @@ GitHub Pages cannot send headers or redirects, so the build adds a Content-Secur
 ## Contact form and email
 
 - The form sends through [Web3Forms](https://web3forms.com) (free, 250 messages a month) to **velnovaragroup@gmail.com**. Get an access key at web3forms.com for that address and put it in `formKey` in the `company` object of `scripts/content.mjs`. The key is meant to be public: it only lets the form deliver to the inbox registered with it. Replies go to the visitor's own address.
-- The public address shown on the site is **support@velnovaragroup.eu**. Porkbun email forwarding delivers it to velnovaragroup@gmail.com, and Gmail's *Send mail as* (SMTP `smtp.resend.com`) sends replies from it.
+- The main address shown on the site is **info@velnovaragroup.eu**; **support@velnovaragroup.eu** appears only in the privacy note and the legal pages. Porkbun email forwarding delivers both to velnovaragroup@gmail.com, and Gmail's *Send mail as* (SMTP `smtp.resend.com`) sends replies from it.
 
 Without an access key, or if Web3Forms fails, the form shows an honest error with the support address; it never pretends to send. Bots that fill the hidden honeypot field get a success message and nothing is sent. If spam ever gets through, enable Web3Forms' captcha.
 
 ## Edit the website
 
-- `scripts/content.mjs`: all Bulgarian and English text, plus company details.
+- `scripts/content.mjs`: Bulgarian and English text, plus company details. German, French, Spanish and Italian are in `scripts/lang/` (same structure; a test checks that every language has exactly the same keys). Legal pages exist in Bulgarian and English; the other languages link to the English ones.
+- `public/lang.js`: on the homepage address only, opens the version in the visitor's browser language (BG, EN, DE, FR, ES, IT; any other language gets English). A language picked in the site's language menu is remembered and wins. No outside service is used and nothing is stored on a server.
 - `scripts/legal.mjs`: privacy policy and GDPR page text.
 - `scripts/build.mjs`: page structure, metadata, sitemap and static generation. CSS and JS links get a content hash, so visitors always receive the latest version after a rebuild.
 - `public/styles.css`: responsive design, colours, typography, spacing, and reduced-motion handling.

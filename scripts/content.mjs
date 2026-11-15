@@ -1,4 +1,10 @@
-// All visible text for the one-page site. Bulgarian is the default language.
+// All visible text for the one-page site. Bulgarian is the default language; English, German, French,
+// Spanish and Italian live in scripts/lang/. Legal pages exist in Bulgarian and English only.
+import de from './lang/de.mjs';
+import fr from './lang/fr.mjs';
+import es from './lang/es.mjs';
+import it from './lang/it.mjs';
+
 // Registered company details (Търговски регистър). The footer shows the name, ЕИК and city;
 // the privacy policy and structured data use the rest. An empty field is simply left out.
 export const company = {
@@ -9,8 +15,15 @@ export const company = {
     bg: 'ул. „Градина“ № 53, Киноцентъра III, р-н Витоша, 1616 София, България',
     en: '53 Gradina St., Kinotsentara III, Vitosha district, 1616 Sofia, Bulgaria'
   },
-  postal: { street: { bg: 'ул. „Градина“ № 53', en: '53 Gradina St.' }, code: '1616', city: { bg: 'София', en: 'Sofia' }, country: { bg: 'България', en: 'Bulgaria' } },
-  contactEmail: 'support@velnovaragroup.eu', // public address; Porkbun forwards it to velnovaragroup@gmail.com
+  postal: {
+    street: { bg: 'ул. „Градина“ № 53', en: '53 Gradina St.' },
+    code: '1616',
+    city: { bg: 'София', en: 'Sofia', de: 'Sofia', fr: 'Sofia', es: 'Sofía', it: 'Sofia' },
+    country: { bg: 'България', en: 'Bulgaria', de: 'Bulgarien', fr: 'Bulgarie', es: 'Bulgaria', it: 'Bulgaria' }
+  },
+  // Both addresses are forwarded by Porkbun to velnovaragroup@gmail.com.
+  contactEmail: 'info@velnovaragroup.eu',      // main address, shown in the contact section
+  supportEmail: 'support@velnovaragroup.eu',   // privacy and data requests: footer note and legal pages
   contactPhone: '+359 896 726 277',
   // Web3Forms access key for the contact form. It is meant to be public: it only lets the
   // form deliver to the inbox registered at web3forms.com (velnovaragroup@gmail.com).
@@ -20,8 +33,6 @@ export const company = {
 export const content = {
   bg: {
     nav: ['Начало', 'Услуги', 'За нас', 'Контакти'],
-    // Phone layout: shortcut cards under the hero.
-    mobile: { products: 'Продукти', shortcuts: 'Бързи връзки' },
     navLabel: 'Основна навигация',
     footerNavLabel: 'Навигация в долната част',
     legalNavLabel: 'Правна информация',
@@ -54,47 +65,41 @@ export const content = {
       title: 'С какво можем да помогнем.',
       intro: 'Пет направления, един подход: започваме от реалния проблем във вашата работа, а не от технологията.',
       indexLabel: 'Списък на услугите',
-      exampleLabel: 'Например',
       items: [
         {
           id: 'automation',
           title: 'Автоматизация на процеси',
           pitch: 'Спрете да въвеждате едни и същи данни на няколко места.',
           body: 'Свързваме стъпките, които днес минават през имейли, таблици и ръчно копиране.',
-          features: ['Автоматични одобрения и известия', 'Обработка на документи и фактури', 'Работни процеси в CRM'],
-          example: 'Ново запитване от сайта автоматично създава запис в CRM и задача за екипа — без нито едно повторно въвеждане.'
+          features: ['Автоматични одобрения и известия', 'Обработка на документи и фактури', 'Работни процеси в CRM']
         },
         {
           id: 'ai',
           title: 'AI решения',
           pitch: 'Намирайте отговори в собствените си документи за секунди.',
           body: 'AI инструменти, които работят с вашите данни и винаги показват източника си.',
-          features: ['Търсене във фирмени документи', 'Извличане и обобщаване на данни', 'Асистенти с човешка проверка'],
-          example: 'Служител пита „Какви са условията за връщане при клиент Х?“ и получава отговор с връзка към точния договор.'
+          features: ['Търсене във фирмени документи', 'Извличане и обобщаване на данни', 'Асистенти с човешка проверка']
         },
         {
           id: 'platforms',
           title: 'SaaS и уеб платформи',
           pitch: 'От идея до работещ продукт с реални потребители.',
           body: 'Започваме с най-малката полезна версия и я развиваме според обратната връзка.',
-          features: ['SaaS продукти', 'Клиентски и партньорски портали', 'Вътрешни системи'],
-          example: 'Клиентите ви подават заявки и следят статуса им в собствен портал, вместо да звънят за всяка промяна.'
+          features: ['SaaS продукти', 'Клиентски и партньорски портали', 'Вътрешни системи']
         },
         {
           id: 'apis',
           title: 'API интеграции',
           pitch: 'Вашите системи най-сетне говорят помежду си.',
           body: 'Ясни правила коя система е водеща — без дубликати и изгубени данни.',
-          features: ['Връзка с външни услуги', 'Разработка на собствени API', 'Синхронизация и обработка на грешки'],
-          example: 'Промяна на клиентски запис в CRM се отразява автоматично в счетоводството и в онлайн магазина.'
+          features: ['Връзка с външни услуги', 'Разработка на собствени API', 'Синхронизация и обработка на грешки']
         },
         {
           id: 'websites',
           title: 'Уебсайтове',
           pitch: 'Сайт, който представя бизнеса ви и носи запитвания.',
           body: 'Бързи и ясни сайтове с форми за контакт, които наистина достигат до вас.',
-          features: ['Фирмени сайтове', 'Дизайн за телефон и компютър', 'Многоезично съдържание'],
-          example: 'Двуезичен фирмен сайт, който обяснява услугите ви ясно и води посетителя директно до запитване.'
+          features: ['Фирмени сайтове', 'Дизайн за телефон и компютър', 'Многоезично съдържание']
         }
       ]
     },
@@ -136,7 +141,7 @@ export const content = {
       sending: 'Изпращане…',
       success: 'Благодарим ви! Запитването е изпратено и ще се свържем с вас скоро.',
       error: 'Съобщението не беше изпратено. Моля, опитайте отново.',
-      unavailable: 'Формулярът временно не е достъпен. Опитайте отново по-късно или ни пишете на support@velnovaragroup.eu.',
+      unavailable: 'Формулярът временно не е достъпен. Опитайте отново по-късно или ни пишете на {email}.',
       rate: 'Твърде много опити за кратко време. Моля, опитайте отново след няколко минути.'
     },
 
@@ -148,12 +153,12 @@ export const content = {
 
     legal: ['Политика за поверителност', 'Защита на данните (GDPR)'],
     backHome: 'Към началната страница',
-    languageName: 'Превключи на български'
+    langName: 'Български',
+    languageMenu: 'Език'
   },
 
   en: {
     nav: ['Home', 'Services', 'About', 'Contact'],
-    mobile: { products: 'Products', shortcuts: 'Quick links' },
     navLabel: 'Main navigation',
     footerNavLabel: 'Footer navigation',
     legalNavLabel: 'Legal information',
@@ -186,47 +191,41 @@ export const content = {
       title: 'What we can help with.',
       intro: 'Five areas, one approach: we start from the real problem in your work, not from the technology.',
       indexLabel: 'List of services',
-      exampleLabel: 'For example',
       items: [
         {
           id: 'automation',
           title: 'Process automation',
           pitch: 'Stop typing the same data into several places.',
           body: 'We connect the steps that currently run through emails, spreadsheets and copy-paste.',
-          features: ['Automatic approvals and notifications', 'Document and invoice processing', 'CRM workflows'],
-          example: 'A new website enquiry automatically creates a CRM record and a task for your team — without retyping anything.'
+          features: ['Automatic approvals and notifications', 'Document and invoice processing', 'CRM workflows']
         },
         {
           id: 'ai',
           title: 'AI solutions',
           pitch: 'Find answers in your own documents in seconds.',
           body: 'AI tools that work with your own data and always show their source.',
-          features: ['Company document search', 'Data extraction and summaries', 'Assistants with human review'],
-          example: 'An employee asks “What are the return terms for client X?” and gets an answer linked to the exact contract.'
+          features: ['Company document search', 'Data extraction and summaries', 'Assistants with human review']
         },
         {
           id: 'platforms',
           title: 'SaaS & web platforms',
           pitch: 'From idea to a working product with real users.',
           body: 'We start with the smallest useful version and grow it based on feedback.',
-          features: ['SaaS products', 'Customer and partner portals', 'Internal systems'],
-          example: 'Your customers submit requests and track their status in their own portal instead of calling about every change.'
+          features: ['SaaS products', 'Customer and partner portals', 'Internal systems']
         },
         {
           id: 'apis',
           title: 'API integrations',
           pitch: 'Your systems finally talk to each other.',
           body: 'Clear rules for which system leads — no duplicates, no lost data.',
-          features: ['Third-party connections', 'Custom API development', 'Sync and error handling'],
-          example: 'A change to a customer record in the CRM automatically reaches accounting and your online store.'
+          features: ['Third-party connections', 'Custom API development', 'Sync and error handling']
         },
         {
           id: 'websites',
           title: 'Websites',
           pitch: 'A website that presents your business and brings in enquiries.',
           body: 'Fast, clear websites with contact forms that actually reach you.',
-          features: ['Company websites', 'Mobile and desktop design', 'Multilingual content'],
-          example: 'A bilingual company website that explains your services clearly and leads visitors straight to an enquiry.'
+          features: ['Company websites', 'Mobile and desktop design', 'Multilingual content']
         }
       ]
     },
@@ -266,9 +265,9 @@ export const content = {
     form: {
       send: 'Send enquiry',
       sending: 'Sending…',
-      success: 'Thank you! Your enquiry has been sent and we will be in touch soon.',
+      success: 'Thank you! Your enquiry has been sent, and we will be in touch soon.',
       error: 'Your message was not sent. Please try again.',
-      unavailable: 'The form is temporarily unavailable. Please try again later or email us at support@velnovaragroup.eu.',
+      unavailable: 'The form is temporarily unavailable. Please try again later or email us at {email}.',
       rate: 'Too many attempts in a short time. Please try again in a few minutes.'
     },
 
@@ -280,6 +279,12 @@ export const content = {
 
     legal: ['Privacy policy', 'Data protection (GDPR)'],
     backHome: 'Back to the homepage',
-    languageName: 'Switch to English'
-  }
+    langName: 'English',
+    languageMenu: 'Language'
+  },
+
+  de, fr, es, it
 };
+
+// Order of the language menu.
+export const languages = ['bg', 'en', 'de', 'fr', 'es', 'it'];
