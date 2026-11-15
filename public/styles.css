@@ -443,8 +443,9 @@ svg{display:block;width:28px;height:28px}
   .hero .actions{gap:13px}
   .hero .eyebrow{font-size:10.5px;letter-spacing:.14em}
   .service-head{flex-direction:column;gap:16px}
-  .footer-info{flex-direction:column;align-items:center;gap:4px}
-  .footer-info>.sep{display:none}
+  /* © company · UIC · city on one line; each part stays whole if a very narrow screen has to wrap. */
+  .footer-info{gap:2px 6px;font-size:clamp(9.5px,calc((100vw - 44px) / 32),11.5px)}
+  .footer-info>span{white-space:nowrap}
 }
 
 @media (max-width:370px){
