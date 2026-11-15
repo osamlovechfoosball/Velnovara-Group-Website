@@ -103,7 +103,7 @@ const path = require('node:path');
 
   // Phones: services are an accordion; tapping a title opens it and closes the others.
   assert.equal(await page.locator('.service-tabs').isVisible(), false);
-  assert.equal(await page.locator('.service.open').count(), 1);
+  assert.equal(await page.locator('.service.open').count(), 0, 'Phones start with every service closed');
   await page.locator('#ai .service-head').click();
   assert.equal(await page.locator('.service.open').count(), 1);
   assert.ok(await page.locator('#ai .feature-list').isVisible());

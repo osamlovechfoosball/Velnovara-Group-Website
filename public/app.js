@@ -150,9 +150,11 @@ if (servicesLayout) {
         ['role', 'tabindex', 'aria-expanded', 'aria-controls'].forEach(name => heads[i].removeAttribute(name));
       }
     });
-    select(Math.max(current, 0), { animate: false });
+    // Phones start with every service closed (unless the address points to one); larger screens show one.
+    if (accordion) openService(current);
+    else select(Math.max(current, 0), { animate: false });
   };
-  current = Math.max(0, panels.findIndex(panel => `#${panel.id}` === location.hash));
+  current = panels.findIndex(panel => `#${panel.id}` === location.hash);
   applyLayout();
   phone.addEventListener('change', applyLayout);
   servicesLayout.classList.add('tabs-ready');
