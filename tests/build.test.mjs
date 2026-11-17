@@ -92,3 +92,11 @@ test('the built site contains no secrets or private addresses', async () => {
     assert.doesNotMatch(text, /velnovaragroup@gmail\.com|osamlovechfoosball/, `private address in ${file}`);
   }
 });
+
+test('each language page shares its own preview image', async () => {
+  for (const lang of ['bg', 'en', 'de', 'fr', 'es', 'it']) {
+    const html = await read(lang === 'bg' ? 'index.html' : `${lang}/index.html`);
+    assert.match(html, new RegExp(`<meta property="og:image" content="https://velnovaragroup\.eu/assets/og/og-${lang}\.jpg">`), lang);
+    await read(`assets/og/og-${lang}.jpg`).catch(() => assert.fail(`missing og-${lang}.jpg`));
+  }
+});

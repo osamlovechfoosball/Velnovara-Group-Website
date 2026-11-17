@@ -65,7 +65,7 @@ Without an access key, or if Web3Forms fails, the form shows an honest error wit
 - `public/app.js`: mobile menu, section highlighting, keeping the scroll position when switching language, service tabs, scroll reveals and form interaction.
 - `public/enquiry.js`: sends the contact form to Web3Forms.
 - `public/assets/mark.svg`: vector recreation of the approved symbol.
-- `public/assets/og-image.jpg`: image shown when the site is shared on social media or messengers.
+- `public/assets/og/og-<lang>.jpg`: the image shown when a page is shared in messengers and social media, one per language (each language page points to its own).
 - `brand/logo-original.png`: original approved logo reference (not published with the site). `brand/unused/` holds earlier artwork the site no longer uses.
 - `server.mjs`: local preview server for `dist/`.
 - `tests/`: automated checks (see below).
