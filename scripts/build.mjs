@@ -69,18 +69,20 @@ const footer = lang => {
   const f = t.footer;
   // One row (logo · menu · legal links), then a short privacy note and one quiet legal line:
   // © company · ЕИК · city. The full address is in the privacy policy.
+  // Computers show the legal links in the top row; phones show them under the privacy note instead.
+  const legalNav = cls => `<nav class="${cls}" aria-label="${t.legalNavLabel}">${legalPages.map((p, i) => `<a href="${legalHref(lang, p)}">${t.legal[i]}</a>`).join('')}</nav>`;
   const info = [
     `© ${year} ${pick(company.legalName, lang)}`,
     company.eik && `${f.eik} ${company.eik}`,
     company.vat && `${f.vat} ${company.vat}`,
     `${pick(company.postal.city, lang)}, ${pick(company.postal.country, lang)}`
   ].filter(Boolean);
-  return `<footer class="site-footer"><div class="wrap footer-row">${brand(lang)}<nav class="footer-nav" aria-label="${t.footerNavLabel}">${navLinks(lang)}</nav><nav class="legal-links" aria-label="${t.legalNavLabel}">${legalPages.map((p, i) => `<a href="${legalHref(lang, p)}">${t.legal[i]}</a>`).join('')}</nav></div><div class="wrap footer-bottom"><p class="footer-privacy">${withEmail(f.privacy, `<a href="mailto:${company.supportEmail}">${company.supportEmail}</a>`)}</p><p class="footer-info">${info.map(item => `<span>${item}</span>`).join('<span class="sep" aria-hidden="true">·</span>')}</p></div></footer>`;
+  return `<footer class="site-footer"><div class="wrap footer-row">${brand(lang)}<nav class="footer-nav" aria-label="${t.footerNavLabel}">${navLinks(lang)}</nav>${legalNav('legal-links')}</div><div class="wrap footer-bottom"><p class="footer-privacy">${withEmail(f.privacy, `<a href="mailto:${company.supportEmail}">${company.supportEmail}</a>`)}</p>${legalNav('legal-links legal-links-bottom')}<p class="footer-info">${info.map(item => `<span>${item}</span>`).join('<span class="sep" aria-hidden="true">·</span>')}</p></div></footer>`;
 };
 
-// On phones the hero shows the desk photo behind the title (on larger screens it is the hero background).
+// On phones the hero shows the laptop photo (owner-supplied) behind the title; larger screens keep the desk photo as the hero background.
 // The source only matches phone widths, so desktop browsers load the 1-pixel placeholder instead.
-const heroPhoto = `<picture class="hero-photo"><source media="(max-width: 700px)" type="image/webp" srcset="/assets/workflow-desk.webp"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="1600" height="900" alt="" fetchpriority="high"></picture>`;
+const heroPhoto = `<picture class="hero-photo"><source media="(max-width: 700px)" type="image/webp" srcset="/assets/laptop-code-600.webp 600w, /assets/laptop-code-900.webp 900w" sizes="100vw"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="900" height="599" alt="" fetchpriority="high"></picture>`;
 
 const hero = t => `<section class="hero" id="top"><div class="wrap hero-inner"><div class="hero-copy"><div class="hero-title">${heroPhoto}<p class="eyebrow">${t.slogan}</p><h1>${t.hero.title[0]} <span>${t.hero.title[1]}</span></h1></div><p class="lead">${t.hero.lead}</p><div class="actions"><a class="button" href="#services">${t.hero.primary}<span aria-hidden="true">→</span></a><a class="button button-secondary" href="#contact">${t.hero.secondary}</a></div></div><ul class="workflow" aria-label="${t.hero.cardsLabel}">${t.hero.cards.map(([label, text], i) => `<li class="workflow-card"><span class="workflow-icon">${svg(serviceIcons[i])}</span><strong>${label}</strong><span class="workflow-text">${text}</span></li>`).join('')}</ul></div></section>`;
 
