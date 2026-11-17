@@ -80,7 +80,7 @@ const footer = lang => {
   return `<footer class="site-footer"><div class="wrap footer-row">${brand(lang)}<nav class="footer-nav" aria-label="${t.footerNavLabel}">${navLinks(lang)}</nav>${legalNav('legal-links')}</div><div class="wrap footer-bottom"><p class="footer-privacy">${withEmail(f.privacy, `<a href="mailto:${company.supportEmail}">${company.supportEmail}</a>`)}</p>${legalNav('legal-links legal-links-bottom')}<p class="footer-info">${info.map(item => `<span>${item}</span>`).join('<span class="sep" aria-hidden="true">·</span>')}</p></div></footer>`;
 };
 
-// On phones the hero shows the laptop photo (owner-supplied) behind the title; larger screens keep the desk photo as the hero background.
+// On phones the hero shows the laptop photo (owner-supplied) behind the title; larger screens show the same photo as the hero background (styles.css).
 // The source only matches phone widths, so desktop browsers load the 1-pixel placeholder instead.
 const heroPhoto = `<picture class="hero-photo"><source media="(max-width: 700px)" type="image/webp" srcset="/assets/laptop-code-600.webp 600w, /assets/laptop-code-900.webp 900w" sizes="100vw"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="900" height="599" alt="" fetchpriority="high"></picture>`;
 

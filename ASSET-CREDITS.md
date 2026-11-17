@@ -26,6 +26,6 @@ Manrope by Mikhail Sharanda, SIL Open Font License 1.1 (`public/assets/fonts/OFL
 
 `public/assets/fonts/marcellus-latin-400.woff2` is Marcellus Regular (basic Latin) by Astigmatic, from Google Fonts, licensed under the SIL Open Font License 1.1 (same licence text as `public/assets/fonts/OFL.txt`). It is used only for the word GROUP in the logo.
 
-## Laptop photo (phone homepage)
+## Laptop photo (homepage hero)
 
-`public/assets/laptop-code-600.webp` and `laptop-code-900.webp` are WebP versions of a photo supplied by Velnovara Group (source: `brand/laptop-code-source.jpg`). They are used as the homepage background on phones only.
+`public/assets/laptop-code-600.webp`, `laptop-code-900.webp` and `laptop-code-1600.webp` are WebP versions of a photo supplied by Velnovara Group (source: `brand/laptop-code-source.jpg`). They are the homepage hero background: the two smaller files on phones, the large one on tablets and computers.
