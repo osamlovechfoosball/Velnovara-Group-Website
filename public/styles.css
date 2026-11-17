@@ -112,8 +112,8 @@ svg{display:block;width:28px;height:28px}
 
 /* Hero */
 .hero{position:relative;overflow:hidden;background:var(--paper)}
-/* The laptop photo fills the hero; a dark fade from the left keeps the white title readable. */
-.hero:before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,12,16,.88) 0%,rgba(10,12,16,.72) 40%,rgba(10,12,16,.25) 75%,rgba(10,12,16,.1) 100%),url(/assets/laptop-code-1600.webp) 70% center/cover no-repeat;transform-origin:center;animation:settle 2.4s var(--ease) both}
+/* The laptop photo (mirrored so the laptop sits on the right) behind the cards; a white fade from the left keeps the title clear. */
+.hero:before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#fff 0%,#fff 36%,rgba(255,255,255,.72) 52%,rgba(255,255,255,0) 72%),url(/assets/laptop-code-right-1600.webp) right center/auto 100% no-repeat;transform-origin:right center;animation:settle 2.4s var(--ease) both}
 /* Hero content arrives in sequence on page load. */
 .hero-copy>*{animation:rise .9s var(--ease) backwards}
 .hero-copy>:nth-child(2){animation-delay:.08s}
@@ -131,14 +131,11 @@ svg{display:block;width:28px;height:28px}
 .hero .eyebrow{margin-bottom:25px;font-size:11px;font-weight:600;letter-spacing:.24em}
 .hero .eyebrow:before{display:none}
 .hero h1{font-size:clamp(2.6rem,4.35vw,3.95rem);font-weight:700;letter-spacing:-.05em;line-height:1.04}
-.hero h1,.hero h1 span{color:#fff}
-.hero h1 span{display:block}
-.hero .eyebrow{color:#e8c98c}
-.hero .lead{margin-top:24px;max-width:510px;font-size:clamp(1.2rem,1.8vw,1.6rem);line-height:1.4;color:#d9d6cf}
+.hero h1 span{display:block;color:var(--ink)}
+.hero .lead{margin-top:24px;max-width:510px;font-size:clamp(1.2rem,1.8vw,1.6rem);line-height:1.4}
 .hero .actions{gap:22px;margin-top:31px}
 .hero .button{border-radius:0;gap:25px;padding-inline:25px;font-size:14px;font-weight:600}
-.hero .button-secondary{background:transparent;color:#fff;border-color:#fff}
-.hero .button-secondary:hover{background:#fff;color:var(--ink);border-color:#fff;box-shadow:none}
+.hero .button-secondary:hover{background:var(--soft);color:var(--ink);box-shadow:none}
 
 .workflow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;list-style:none;padding:0}
 .workflow-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 12px;text-align:center;background:linear-gradient(145deg,#fff,#f7f3eb);border:1px solid #fff;border-radius:8px;box-shadow:0 12px 28px #5349362a;transition:transform .4s var(--ease),box-shadow .4s,border-color .3s}
@@ -328,7 +325,7 @@ svg{display:block;width:28px;height:28px}
   body.menu-open{overflow:hidden}
   body.menu-open .site-header{background:#fff}
 
-  .hero:before{background:linear-gradient(180deg,rgba(10,12,16,.86) 0%,rgba(10,12,16,.7) 55%,rgba(10,12,16,.45) 100%),url(/assets/laptop-code-1600.webp) 30% center/cover no-repeat}
+  .hero:before{background:linear-gradient(180deg,#fff 0%,#fff 50%,rgba(255,255,255,.55) 75%,rgba(255,255,255,0) 100%),url(/assets/laptop-code-right-1600.webp) center bottom/100% auto no-repeat}
   .hero-inner{min-height:0;padding-block:56px 72px}
 
   .services-layout{grid-template-columns:minmax(0,1fr);gap:20px}
@@ -352,14 +349,14 @@ svg{display:block;width:28px;height:28px}
   .brand-slogan{display:none}
   .hero:before{display:none}
   .hero-inner{padding-block:0 30px;gap:0}
-  .hero-title{position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-height:300px;margin:0 -20px;padding:0 20px 24px;overflow:hidden;background:#1d2433}
+  .hero-title{position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-height:360px;margin:0 -20px;padding:0 20px 18px;overflow:hidden;background:#fff}
   .hero-photo,.hero-photo img{display:block;position:absolute;inset:0;width:100%;height:100%}
-  .hero-photo img{object-fit:cover;object-position:0% center}
-  /* The laptop sits in the middle of the photo; the title sits on a dark fade at the bottom. */
-  .hero-title:after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 0%,#0b0f1a40 45%,#0b0f1ad9 100%)}
+  .hero-photo img{object-fit:cover;object-position:100% center}
+  /* The laptop sits on the right; the photo fades to white behind the dark title. */
+  .hero-title:after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,0) 0%,rgba(255,255,255,0) 30%,rgba(255,255,255,.7) 62%,#fff 88%)}
   .hero-title>.eyebrow,.hero-title>h1{position:relative;z-index:1}
-  .hero .hero-title .eyebrow{margin-bottom:12px;color:#e8c98c}
-  .hero h1,.hero h1 span{color:#fff;text-shadow:0 2px 18px #0006}
+  .hero .hero-title .eyebrow{margin-bottom:12px;color:var(--gold)}
+  .hero h1,.hero h1 span{color:var(--ink)}
   .hero .lead{margin-top:16px;font-size:16.5px;line-height:1.5;color:var(--ink)}
   .hero .actions{display:block;margin-top:14px}
   .hero .button{min-height:44px;padding:0 0 2px;gap:10px;border:0;border-bottom:2px solid var(--ink);border-radius:0;background:none;color:var(--ink);font-size:16px;font-weight:700;box-shadow:none}

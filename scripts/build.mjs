@@ -82,7 +82,7 @@ const footer = lang => {
 
 // On phones the hero shows the laptop photo (owner-supplied) behind the title; larger screens show the same photo as the hero background (styles.css).
 // The source only matches phone widths, so desktop browsers load the 1-pixel placeholder instead.
-const heroPhoto = `<picture class="hero-photo"><source media="(max-width: 700px)" type="image/webp" srcset="/assets/laptop-code-600.webp 600w, /assets/laptop-code-900.webp 900w" sizes="100vw"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="900" height="599" alt="" fetchpriority="high"></picture>`;
+const heroPhoto = `<picture class="hero-photo"><source media="(max-width: 700px)" type="image/webp" srcset="/assets/laptop-code-right-600.webp 600w, /assets/laptop-code-right-900.webp 900w" sizes="100vw"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="900" height="599" alt="" fetchpriority="high"></picture>`;
 
 const hero = t => `<section class="hero" id="top"><div class="wrap hero-inner"><div class="hero-copy"><div class="hero-title">${heroPhoto}<p class="eyebrow">${t.slogan}</p><h1>${t.hero.title[0]} <span>${t.hero.title[1]}</span></h1></div><p class="lead">${t.hero.lead}</p><div class="actions"><a class="button" href="#services">${t.hero.primary}<span aria-hidden="true">→</span></a><a class="button button-secondary" href="#contact">${t.hero.secondary}</a></div></div><ul class="workflow" aria-label="${t.hero.cardsLabel}">${t.hero.cards.map(([label, text], i) => `<li class="workflow-card"><span class="workflow-icon">${svg(serviceIcons[i])}</span><strong>${label}</strong><span class="workflow-text">${text}</span></li>`).join('')}</ul></div></section>`;
 

@@ -28,4 +28,4 @@ Manrope by Mikhail Sharanda, SIL Open Font License 1.1 (`public/assets/fonts/OFL
 
 ## Laptop photo (homepage hero)
 
-`public/assets/laptop-code-600.webp`, `laptop-code-900.webp` and `laptop-code-1600.webp` are WebP versions of a photo supplied by Velnovara Group (source: `brand/laptop-code-source.jpg`). They are the homepage hero background: the two smaller files on phones, the large one on tablets and computers.
+`public/assets/laptop-code-right-600.webp`, `laptop-code-right-900.webp` and `laptop-code-right-1600.webp` are mirrored WebP versions of a photo supplied by Velnovara Group (source: `brand/laptop-code-source.jpg`), so the laptop sits on the right. They are the homepage hero background: the two smaller files on phones, the large one on tablets and computers.
